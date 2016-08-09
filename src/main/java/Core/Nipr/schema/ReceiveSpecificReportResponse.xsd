@@ -1,0 +1,150 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.acord.org/schema/data/draft/ReusableDataComponents/1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="LicensingReportProcessResult">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="MessageHeader">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="MessageId"/>
+              <xs:element type="xs:string" name="CorrelationId"/>
+              <xs:element type="xs:dateTime" name="MessageDateTime"/>
+              <xs:element type="xs:byte" name="MessageDocumentCount"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MessageResult">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="StatusCode"/>
+              <xs:element name="MessageDocumentResult">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="MessageDocumentReferences">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element type="xs:string" name="DocumentId"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element type="xs:string" name="StatusCode"/>
+                    <xs:element type="xs:string" name="SuccessCode"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="LicensingReport">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Address" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="LineOne"/>
+                    <xs:element type="xs:string" name="CityName"/>
+                    <xs:element type="xs:string" name="StateOrProvinceCode"/>
+                    <xs:element type="xs:string" name="PostalCode"/>
+                    <xs:element type="xs:string" name="CountryCode"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="key" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Person" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ExternalIdentifier">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element type="xs:string" name="TypeCode"/>
+                          <xs:element type="xs:int" name="Id"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="key" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="JurisdictionReport" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="PersonReferences">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="personReference" use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="JurisdictionReportItem" maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element type="xs:string" name="StateOrProvinceCode"/>
+                          <xs:element name="Licensee">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="InsuranceLicense" maxOccurs="unbounded" minOccurs="0">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element type="xs:string" name="ResidentLicenseIndicator"/>
+                                      <xs:element type="xs:string" name="TypeCode"/>
+                                      <xs:element name="License">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element type="xs:int" name="LicenseNumberId"/>
+                                            <xs:element name="LicensePeriod">
+                                              <xs:complexType mixed="true">
+                                                <xs:sequence>
+                                                  <xs:element type="xs:date" name="EndDate" minOccurs="0"/>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element type="xs:string" name="StatusCode"/>
+                                            <xs:element type="xs:date" name="IssueDate"/>
+                                            <xs:element type="xs:byte" name="LicenseClassCode"/>
+                                            <xs:element type="xs:string" name="LicenseClassDescription"/>
+                                            <xs:element type="xs:string" name="StateOrProvinceCode"/>
+                                            <xs:element type="xs:string" name="StateOrProvinceName"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="LineOfAuthority" maxOccurs="unbounded" minOccurs="0">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element type="xs:date" name="IssueDate"/>
+                                            <xs:element type="xs:string" name="StateOrProvinceCode"/>
+                                            <xs:element type="xs:string" name="StateOrProvinceName"/>
+                                            <xs:element type="xs:short" name="LineOfAuthorityCode"/>
+                                            <xs:element type="xs:string" name="LineOfAuthorityDescription"/>
+                                            <xs:element type="xs:string" name="StatusCode"/>
+                                            <xs:element type="xs:string" name="StatusDescription"/>
+                                            <xs:element type="xs:string" name="StatusReasonCode" minOccurs="0"/>
+                                            <xs:element name="StatusPeriod">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element type="xs:date" name="StartDate"/>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

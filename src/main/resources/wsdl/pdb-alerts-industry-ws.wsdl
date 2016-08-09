@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	targetNamespace="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+	xmlns:wssoap12="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:paiw="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws"
+	xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xsi:schemaLocation="http://schemas.xmlsoap.org/wsdl/
+	cross-industry-schemas\wsdl-2004-08-24.xsd">
+
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws" targetNamespace="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+		<xsd:simpleType name="NpnType">
+			<xsd:restriction base="xsd:string"/>
+		</xsd:simpleType>
+		<xsd:simpleType name="SsnType">
+			<xsd:restriction base="xsd:string">
+				<xsd:pattern value="^([0-8]\\d{2})([ \\-]?)(\\d{2})\\2(\\d{4})$"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+		<xsd:simpleType name="FeinType">
+			<xsd:restriction base="xsd:string">
+				<xsd:pattern value="[0-9]{9}|[0-9]{2}-[0-9]{7}"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+		<xsd:simpleType name="NameType">
+			<xsd:restriction base="xsd:string"/>
+		</xsd:simpleType>
+		<xsd:simpleType name="CocodeType">
+			<xsd:restriction base="xsd:string"/>
+		</xsd:simpleType>
+		<xsd:simpleType name="StateType">
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration value="AL"/>
+				<xsd:enumeration value="AK"/>
+				<xsd:enumeration value="AR"/>
+				<xsd:enumeration value="AZ"/>
+				<xsd:enumeration value="CA"/>
+				<xsd:enumeration value="CO"/>
+				<xsd:enumeration value="CT"/>
+				<xsd:enumeration value="DC"/>
+				<xsd:enumeration value="DE"/>
+				<xsd:enumeration value="FL"/>
+				<xsd:enumeration value="GA"/>
+				<xsd:enumeration value="HI"/>
+				<xsd:enumeration value="IA"/>
+				<xsd:enumeration value="ID"/>
+				<xsd:enumeration value="IL"/>
+				<xsd:enumeration value="IN"/>
+				<xsd:enumeration value="KS"/>
+				<xsd:enumeration value="KY"/>
+				<xsd:enumeration value="LA"/>
+				<xsd:enumeration value="MA"/>
+				<xsd:enumeration value="MD"/>
+				<xsd:enumeration value="ME"/>
+				<xsd:enumeration value="MI"/>
+				<xsd:enumeration value="MN"/>
+				<xsd:enumeration value="MO"/>
+				<xsd:enumeration value="MS"/>
+				<xsd:enumeration value="MT"/>
+				<xsd:enumeration value="NC"/>
+				<xsd:enumeration value="ND"/>
+				<xsd:enumeration value="NE"/>
+				<xsd:enumeration value="NH"/>
+				<xsd:enumeration value="NJ"/>
+				<xsd:enumeration value="NM"/>
+				<xsd:enumeration value="NV"/>
+				<xsd:enumeration value="NY"/>
+				<xsd:enumeration value="OH"/>
+				<xsd:enumeration value="OK"/>
+				<xsd:enumeration value="OR"/>
+				<xsd:enumeration value="PA"/>
+				<xsd:enumeration value="PR"/>
+				<xsd:enumeration value="RI"/>
+				<xsd:enumeration value="SC"/>
+				<xsd:enumeration value="SD"/>
+				<xsd:enumeration value="TN"/>
+				<xsd:enumeration value="TX"/>
+				<xsd:enumeration value="UT"/>
+				<xsd:enumeration value="VA"/>
+				<xsd:enumeration value="VT"/>
+				<xsd:enumeration value="WA"/>
+				<xsd:enumeration value="WI"/>
+				<xsd:enumeration value="WV"/>
+				<xsd:enumeration value="WY"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+       	<xsd:simpleType name="EmailType">
+           	<xsd:restriction base="xsd:string">
+               	<xsd:pattern value="[^@]+@[^\.]+\..+"/>
+           	</xsd:restriction>
+       	</xsd:simpleType>
+		<xsd:simpleType name="InputFormatType">
+   			<xsd:restriction base="xsd:string">
+       			<xsd:enumeration value="SSN_LASTNAME"/>
+       			<xsd:enumeration value="NPN"/>
+       			<xsd:enumeration value="FEIN"/>
+   			</xsd:restriction>
+		</xsd:simpleType>
+		<xsd:simpleType name="AlertType">
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration value="LICENSING"/>
+				<xsd:enumeration value="DEMOGRAPHICS"/>
+				<xsd:enumeration value="APPOINTMENTS"/>
+				<xsd:enumeration value="RIRS"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+		<xsd:complexType name="SsnLNameType">
+			<xsd:sequence>
+				<xsd:element name="ssn" type="paiw:SsnType"/>
+				<xsd:element name="lastname" type="paiw:NameType"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="StateListType">
+            <xsd:choice>
+            	<xsd:element name="allStates" type="xsd:boolean" default="false"/>
+            	<xsd:element name="residentStateOnly" type="xsd:boolean" default="false"/>
+                <xsd:element name="stateList" type="StateType"
+                    maxOccurs="unbounded" minOccurs="1" />
+            </xsd:choice>
+		</xsd:complexType>
+		<xsd:complexType name="AffiliationType">
+			<xsd:sequence>
+				<xsd:element name="fein" type="paiw:FeinType"/>
+				<xsd:element name="cocode" type="paiw:CocodeType"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="AffiliationListType">
+            <xsd:choice>
+            	<xsd:element name="None" type="xsd:boolean" default="false"/>
+            	<xsd:element name="All" type="xsd:boolean" default="false"/>
+                <xsd:element name="affiliationList" type="AffiliationType"
+                    maxOccurs="unbounded" minOccurs="0" />
+            </xsd:choice>
+		</xsd:complexType>
+		<xsd:complexType name="TargetInputType">
+			<xsd:choice>
+				<xsd:element name="ssnLNameList" type="paiw:SsnLNameType" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element name="npnList" type="paiw:NpnType" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element name="feinList" type="paiw:FeinType" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:complexType>
+		<xsd:complexType name="InvalidInputType">
+			<xsd:sequence>
+				<xsd:element name="input" type="xsd:string"/>
+				<xsd:element name="invalidReason" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="AlertTypeListType">
+            <xsd:sequence>
+                <xsd:element name="alertTypeList" type="paiw:AlertType"
+                    maxOccurs="4" minOccurs="0" />
+            </xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="TargetInputDataType">
+            <xsd:sequence>
+				<xsd:element name="inputFormat" type="paiw:InputFormatType" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="targetInputList" type="paiw:TargetInputType"
+                    maxOccurs="1" minOccurs="1" />
+            </xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="SubscriptionInputDataType">
+            <xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+					<xsd:element name="email" type="paiw:EmailType"/>
+					<xsd:element name="affiliationList" type="paiw:AffiliationListType"/>
+					<xsd:element name="stateList" type="paiw:StateListType"/>
+					<xsd:element name="alertTypeList" type="paiw:AlertTypeListType"/>
+            </xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="SubscriptionDataType">
+            <xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+					<xsd:element name="email" type="paiw:EmailType"/>
+					<xsd:element name="affiliationList" type="paiw:AffiliationListType"/>
+					<xsd:element name="stateList" type="paiw:StateListType"/>
+					<xsd:element name="alertTypeList" type="paiw:AlertTypeListType"/>
+            </xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="TargetResultsDataType">
+            <xsd:sequence>
+                <xsd:element name="validTargetList" type="TargetType"
+                    maxOccurs="unbounded" minOccurs="0" />
+                <xsd:element name="invalidInputList" type="InvalidInputType"
+                    maxOccurs="unbounded" minOccurs="0" />
+            </xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="TargetType">
+			<xsd:sequence>
+				<xsd:element name="npn" type="paiw:NpnType"/>
+				<xsd:element name="addedDate" type="xsd:date"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="AlertsReportType">
+			<xsd:sequence>
+				<xsd:element name="alertsReport" type="xsd:base64Binary"
+						xmime:expectedContentTypes="application/octet-stream"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:element name="PdbAlertsFaultType">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="message" type="xsd:string" />
+					<xsd:element name="errorCode" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="receiveSpecificReportResponse">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="alertsReport" type="paiw:AlertsReportType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="alertsReportResponse" type="paiw:AlertsReportType"/>
+		<xsd:element name="addSubscription">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionInputData" type="paiw:SubscriptionInputDataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="editSubscription">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+					<xsd:element name="subscriptionInputData" type="paiw:SubscriptionInputDataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="removeSubscription">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="subscriptionList">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionData" type="paiw:SubscriptionDataType"
+					maxOccurs="unbounded" minOccurs="1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="addTargets">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+					<xsd:element name="targetInputData" type="paiw:TargetInputDataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="addTargetsResponse">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="targetResultsData" type="paiw:TargetResultsDataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="receiveSpecificReport">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="reportDate" type="xsd:date"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="removeTargets">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+					<xsd:element name="targetInputData" type="paiw:TargetInputDataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="removeAllTargets">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="removeTargetsResponse">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="targetResultsData" type="paiw:TargetResultsDataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="retrieveTargets">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="subscriptionName" type="paiw:NameType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="TargetList">
+		<xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="targetList" type="TargetType"
+                    maxOccurs="unbounded" minOccurs="0" />
+            </xsd:sequence>
+         </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="empty">
+         	<xsd:complexType/>
+         </xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="NoParameterRequest">
+		<wsdl:part name="parameters" element="paiw:empty"/>
+	</wsdl:message>
+	<wsdl:message name="ReceiveSpecificReportRequest">
+		<wsdl:part name="parameters" element="paiw:receiveSpecificReport"/>
+	</wsdl:message>
+	<wsdl:message name="pdbAlertsFaultMsg">
+		<wsdl:part name="pdbAlertsFault" element="paiw:PdbAlertsFaultType" />
+	</wsdl:message>
+	<wsdl:message name="AddSubscriptionRequest">
+		<wsdl:part name="parameters" element="paiw:addSubscription"/>
+	</wsdl:message>
+	<wsdl:message name="EditSubscriptionRequest">
+		<wsdl:part name="parameters" element="paiw:editSubscription"/>
+	</wsdl:message>
+	<wsdl:message name="RemoveSubscriptionRequest">
+		<wsdl:part name="parameters" element="paiw:removeSubscription"/>
+	</wsdl:message>
+	<wsdl:message name="AddTargetsRequest">
+		<wsdl:part name="parameters" element="paiw:addTargets"/>
+	</wsdl:message>
+	<wsdl:message name="RemoveTargetsRequest">
+		<wsdl:part name="parameters" element="paiw:removeTargets"/>
+	</wsdl:message>
+	<wsdl:message name="RemoveAllTargetsRequest">
+		<wsdl:part name="parameters" element="paiw:removeAllTargets"/>
+	</wsdl:message>
+	<wsdl:message name="RetrieveTargetsRequest">
+		<wsdl:part name="parameters" element="paiw:retrieveTargets"/>
+	</wsdl:message>
+	<wsdl:message name="EmptyResponse">
+		<wsdl:part name="parameters" element="paiw:empty"/>
+	</wsdl:message>
+	<wsdl:message name="SubscriptionList">
+		<wsdl:part name="response" element="paiw:subscriptionList" />
+	</wsdl:message>
+	<wsdl:message name="AddTargetsResponse">
+		<wsdl:part name="targetList" element="paiw:addTargetsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="RemoveTargetsResponse">
+		<wsdl:part name="targetList" element="paiw:removeTargetsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="RetrieveTargetsResponse">
+		<wsdl:part name="targetList" element="paiw:TargetList"/>
+	</wsdl:message>
+	<wsdl:message name="ReceiveSpecificReportResponse">
+		<wsdl:part name="response" element="paiw:receiveSpecificReportResponse" />
+	</wsdl:message>
+	<wsdl:message name="ReceiveReportResponse">
+		<wsdl:part name="alertsReport" element="paiw:alertsReportResponse" />
+	</wsdl:message>
+	<!--Define Port Type-->
+	<wsdl:portType name="industry-ws">
+		<wsdl:documentation></wsdl:documentation>
+		<wsdl:operation name="receiveCurrentAlertsReport">
+			<wsdl:input message="paiw:NoParameterRequest" />
+			<wsdl:output message="paiw:ReceiveReportResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="generateCatchUpReport">
+			<wsdl:input message="paiw:NoParameterRequest" />
+			<wsdl:output message="paiw:ReceiveReportResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="receiveSpecificReport">
+			<wsdl:input message="paiw:ReceiveSpecificReportRequest" />
+			<wsdl:output message="paiw:ReceiveSpecificReportResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="addSubscription">
+			<wsdl:input message="paiw:AddSubscriptionRequest" />
+			<wsdl:output message="paiw:EmptyResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="editSubscription">
+			<wsdl:input message="paiw:EditSubscriptionRequest" />
+			<wsdl:output message="paiw:EmptyResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="removeSubscription">
+			<wsdl:input message="paiw:RemoveSubscriptionRequest" />
+			<wsdl:output message="paiw:EmptyResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveAllSubscriptions">
+			<wsdl:input message="paiw:NoParameterRequest" />
+			<wsdl:output message="paiw:SubscriptionList" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="addTargets">
+			<wsdl:input message="paiw:AddTargetsRequest" />
+			<wsdl:output message="paiw:AddTargetsResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="removeTargets">
+			<wsdl:input message="paiw:RemoveTargetsRequest" />
+			<wsdl:output message="paiw:RemoveTargetsResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="removeAllTargets">
+			<wsdl:input message="paiw:RemoveAllTargetsRequest" />
+			<wsdl:output message="paiw:EmptyResponse" />
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveTargets">
+			<wsdl:input message="paiw:RetrieveTargetsRequest"/>
+			<wsdl:output message="paiw:RetrieveTargetsResponse"/>
+			<wsdl:fault name="pdbAlertsFault" message="paiw:pdbAlertsFaultMsg"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<!--Define Bindings-->
+	<wsdl:binding name="PdbAlertsIndustryWs_Soap" type="paiw:industry-ws">
+		<wssoap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="receiveCurrentAlertsReport">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveCurrentAlertsReport"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="generateCatchUpReport">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/generateCatchUpReport"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="receiveSpecificReport">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveSpecificReport"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="addSubscription">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/addSubscription"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="editSubscription">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/editSubscription"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="removeSubscription">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/removeSubscription"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveAllSubscriptions">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/retrieveAllSubscriptions"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="addTargets">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/addTargets"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="removeTargets">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/removeTargets"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="removeAllTargets">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/removeAllTargets"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="retrieveTargets">
+			<wssoap12:operation
+				soapAction="https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/retrieveTargets"/>
+			<wsdl:input>
+				<wssoap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<wssoap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="pdbAlertsFault">
+				<wssoap12:fault name="pdbAlertsFault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<!--Define Services and Ports-->
+	<wsdl:service name="PdbAlertsIndustryWs_Service">
+		<wsdl:port binding="paiw:PdbAlertsIndustryWs_Soap" name="PdbAlertsIndustryWs_Port">
+			<!-- Routing of the transaction to the proper back-end sytem is commonly done using a common set of port endpoint addresses combined with payload content base routing. However it is also possible to use different sets of port endpoint addresses to directly access the proper back-end system. In this case the endpoint addresses would need to be known by the web service invoker. -->
+			<wssoap12:address location="https://pdb-services-beta.nipr.com/pdb-alerts-industry-services/services/industry-ws"  wsdl:required="false"/>
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>
