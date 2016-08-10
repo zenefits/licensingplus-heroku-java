@@ -5,28 +5,21 @@ package Core.Nipr;
  */
 import nipr.*;
 import nipr.wsdl.*;
+import Core.Utils.*;
 
-import java.time.LocalDateTime;
 import java.util.GregorianCalendar;
 import java.util.*;
 import javax.activation.DataHandler;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.datatype.DatatypeFactory;
 import java.lang.*;
-import java.text.*;
 import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.DateTime;
 import javax.xml.bind.*;
-import org.springframework.ws.client.core.WebServiceTemplate;
+
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
-import org.springframework.ws.transport.http.*;
-import org.apache.commons.io.*;
-import com.thoughtworks.xstream.*;
 
 public class NiprClient extends WebServiceGatewaySupport {
 
@@ -47,7 +40,7 @@ public class NiprClient extends WebServiceGatewaySupport {
         while(aInDays > 0) {
 
             UpdateCalenderDate(lCal);
-            String lFormattedDate = GetFormattedDate(lCal);
+            String lFormattedDate = CalenderUtils.GetFormattedDate(lCal);
             if(SyncedDates.contains(lFormattedDate)) {
                 System.out.println("Skipping Nipr sync for " + lFormattedDate);
                 continue;
@@ -97,17 +90,6 @@ public class NiprClient extends WebServiceGatewaySupport {
         }
     }
 
-    public boolean IsWeekEnd(GregorianCalendar aInCal) {
-
-        String lDayName = aInCal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
-
-        if(Objects.equals(lDayName, new String("Sun"))
-         || (Objects.equals(lDayName, new String("Sat")))) {
-            return true;
-        }
-        return false;
-    }
-
     public void MergeReports(HashMap<String, LicenseInternal> aInDateInfo1, HashMap<String, LicenseInternal> aInDateInfo2) {
 
         for (LicenseInternal lLicense : aInDateInfo1.values()) {
@@ -115,10 +97,10 @@ public class NiprClient extends WebServiceGatewaySupport {
                 aInDateInfo2.put(lLicense.GetKey(), lLicense);
             }
             else {
-                String lDate1Str = lLicense.CreationDate;
-                GregorianCalendar lDate1 = GetCalenderTimeFromString(lDate1Str);
-                String lDate2Str = aInDateInfo2.get(lLicense.GetKey()).CreationDate;
-                GregorianCalendar lDate2 = GetCalenderTimeFromString(lDate2Str);
+                String lDate1Str = lLicense.niprUpdateDate;
+                GregorianCalendar lDate1 = CalenderUtils.GetCalenderTimeFromString(lDate1Str);
+                String lDate2Str = aInDateInfo2.get(lLicense.GetKey()).niprUpdateDate;
+                GregorianCalendar lDate2 = CalenderUtils.GetCalenderTimeFromString(lDate2Str);
 
                 if(lDate2.compareTo(lDate1) < 0) {
                     aInDateInfo2.put(lLicense.GetKey(), lLicense);
@@ -137,7 +119,7 @@ public class NiprClient extends WebServiceGatewaySupport {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(lDate);
         */
-        String formatted = GetFormattedDate(aInDate);
+        String formatted = CalenderUtils.GetFormattedDate(aInDate);
         System.out.println("Getting Record for ====================== " + formatted);
 
         try {
@@ -283,9 +265,9 @@ public class NiprClient extends WebServiceGatewaySupport {
 
                 //System.out.println("Person " + lPersonRef + " Issued License on " + lLicense.getIssueDate());
                 LicenseInternal lLicenseInt = new LicenseInternal();
-                lLicenseInt.LicenseNumber = Integer.toString(lLicense.getLicenseNumberId());
+                lLicenseInt.licenseNumber = Integer.toString(lLicense.getLicenseNumberId());
                 XMLGregorianCalendar lCal = lLicense.getIssueDate();
-                lLicenseInt.EffectiveDate = ToSFDCDateFormat(lCal);
+                lLicenseInt.effectiveDate = CalenderUtils.ToSFDCDateFormat(lCal);
                 LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.License.LicensePeriod lPeriod = lLicense.getLicensePeriod();
                 if(lPeriod != null) {
                     List<Serializable> lContents = lPeriod.getContent();
@@ -294,39 +276,39 @@ public class NiprClient extends WebServiceGatewaySupport {
                             JAXBElement lElem = (JAXBElement)lContent;
                             if(lElem.getValue() instanceof XMLGregorianCalendar) {
                                 lCal = (XMLGregorianCalendar)lElem.getValue();
-                                lLicenseInt.ExpirationDate = ToSFDCDateFormat(lCal);
+                                lLicenseInt.expirationDate = CalenderUtils.ToSFDCDateFormat(lCal);
                             }
 
                         }
                     }
                 }
-                lLicenseInt.ClassName = lLicense.getLicenseClassDescription();
-                lLicenseInt.NpnNumber = Integer.toString(lNpnNumber);
+                lLicenseInt.className = lLicense.getLicenseClassDescription();
+                lLicenseInt.npnNumber = Integer.toString(lNpnNumber);
                 if(Objects.equals(lInsuranceLicense.getResidentLicenseIndicator(), new String("true"))) {
-                    lLicenseInt.IsResidentState = true;
+                    lLicenseInt.isResidentLicense = true;
                 }
-                lLicenseInt.State = lJdReportItem.getStateOrProvinceCode();
+                lLicenseInt.state = lJdReportItem.getStateOrProvinceCode();
                 List<LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.LineOfAuthority> lLoas = lInsuranceLicense.getLineOfAuthority();
                 boolean oneActiveLoa = false;
                 for(LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.LineOfAuthority l : lLoas) {
                     LineOfAuthorityInternal lLoaInternal = new LineOfAuthorityInternal();
-                    lLoaInternal.Name = l.getLineOfAuthorityDescription();
+                    lLoaInternal.name = l.getLineOfAuthorityDescription();
                     if(Objects.equals(l.getStatusCode().toLowerCase(), new String("active"))) {
-                        lLoaInternal.IsActive = true;
+                        lLoaInternal.isActive = true;
                         oneActiveLoa = true;
                     }
-                    lLicenseInt.Loas.add(lLoaInternal);
+                    lLicenseInt.linesOfAuthority.add(lLoaInternal);
                 }
 
-                if(!isNullOrWhiteSpace(lLicense.getStatusCode())) {
+                if(!CalenderUtils.isNullOrWhiteSpace(lLicense.getStatusCode())) {
                     if(Objects.equals(lLicense.getStatusCode().toLowerCase(), new String("active"))) {
-                        lLicenseInt.IsActive = true;
+                        lLicenseInt.isActive = true;
                     }
                 }
                 else {
-                    lLicenseInt.IsActive = oneActiveLoa;
+                    lLicenseInt.isActive = oneActiveLoa;
                 }
-                lLicenseInt.CreationDate = ToSFDCDateFormat(aInCalDate);
+                lLicenseInt.niprUpdateDate = CalenderUtils.ToSFDCDateFormat(aInCalDate);
                 if(!aInOutAllLicenses.containsKey(lLicenseInt.GetKey())) {
                     aInOutAllLicenses.put(lLicenseInt.GetKey(), lLicenseInt);
                 }
@@ -350,28 +332,4 @@ public class NiprClient extends WebServiceGatewaySupport {
         return lPersonNumberByKey;
     }
 
-    private String ToSFDCDateFormat(XMLGregorianCalendar aInCal) {
-        if(aInCal == null) {
-            return "";
-        }
-        return aInCal.getYear() + "-" + aInCal.getMonth() + "-" + aInCal.getDay();
-    }
-
-    public static boolean isNullOrWhiteSpace(String a) {
-        return a == null || (a.length() > 0 && a.trim().length() <= 0);
-    }
-
-    public String GetFormattedDate(GregorianCalendar aInCal) {
-        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-        String formatted = format1.format(aInCal.getTime());
-        return formatted;
-    }
-
-    public GregorianCalendar GetCalenderTimeFromString(String aInData) {
-        DateTimeFormatter formatter =
-                DateTimeFormat.forPattern("yyyy-MM-dd").withOffsetParsed();
-        DateTime dateTime = formatter.parseDateTime(aInData);
-        GregorianCalendar lCal = dateTime.toGregorianCalendar();
-        return lCal;
-    }
 }

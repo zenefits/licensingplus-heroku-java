@@ -5,15 +5,19 @@ package Core.Nipr;
  */
 public class LineOfAuthorityInternal {
 
-    public String Name;
+    public String name;
 
-    public boolean IsActive;
+    public boolean isActive;
+
+    public LineOfAuthorityInternal() {
+        this.isActive = false;
+    }
 
     @Override
     public String toString() {
         return "LineOfAuthorityInternal{" +
-                "Name='" + Name + '\'' +
-                ", IsActive=" + IsActive +
+                "Name='" + name + '\'' +
+                ", IsActive=" + isActive +
                 '}';
     }
 }

@@ -1,52 +1,66 @@
 package Core.Nipr;
 
 import java.util.*;
+
+import Core.Utils.CalenderUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Created by vthiruvengadam on 8/7/16.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LicenseInternal {
 
-    public String NpnNumber;
+    public String npnNumber;
 
-    public String CreationDate;
+    public String state;
 
-    public String EffectiveDate;
+    public String licenseNumber;
 
-    public String ExpirationDate;
+    public String effectiveDate;
 
-    public String State;
+    public String expirationDate;
 
-    public String LicenseNumber;
+    public String className;
 
-    public Boolean IsActive;
+    public Boolean isResidentLicense;
 
-    public Boolean IsResidentState;
+    public Boolean isActive;
 
-    public String ClassName;
+    public List<LineOfAuthorityInternal> linesOfAuthority;
 
-    public List<LineOfAuthorityInternal> Loas;
+    public String niprUpdateDate;
+
+    @JsonIgnore
+    public String lastErrorCode;
+
+    @JsonIgnore
+    public String lastErrorMessage;
 
     public LicenseInternal() {
-        Loas = new ArrayList<LineOfAuthorityInternal>();
+        linesOfAuthority = new ArrayList<LineOfAuthorityInternal>();
+        isResidentLicense = false;
+        isActive = false;
     }
 
     public String GetKey() {
-        return NpnNumber + ";" + LicenseNumber + ";" + State + ";" + EffectiveDate;
+        return npnNumber + ";" + licenseNumber + ";" + CalenderUtils.GetSdfcStateName(state) + ";" + CalenderUtils.GetSFDCResponseDateFormat(effectiveDate);
     }
 
     @Override
     public String toString() {
         return "LicenseInternal{" +
-                "NpnNumber='" + NpnNumber + '\'' +
-                ", CreationDate='" + CreationDate + '\'' +
-                ", EffectiveDate='" + EffectiveDate + '\'' +
-                ", ExpirationDate='" + ExpirationDate + '\'' +
-                ", State='" + State + '\'' +
-                ", LicenseNumber='" + LicenseNumber + '\'' +
-                ", IsActive=" + IsActive +
-                ", IsResidentState=" + IsResidentState +
-                ", ClassName='" + ClassName + '\'' +
-                ", Loas=" + Loas +
+                "npnNumber='" + npnNumber + '\'' +
+                ", niprUpdateDate='" + niprUpdateDate + '\'' +
+                ", effectiveDate='" + effectiveDate + '\'' +
+                ", expirationDate='" + expirationDate + '\'' +
+                ", state='" + state + '\'' +
+                ", licenseNumber='" + licenseNumber + '\'' +
+                ", isActive=" + isActive +
+                ", isResidentLicense=" + isResidentLicense +
+                ", className='" + className + '\'' +
+                ", linesOfAuthority=" + linesOfAuthority +
                 '}';
     }
 }

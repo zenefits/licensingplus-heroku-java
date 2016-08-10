@@ -14,7 +14,7 @@ class WebServiceMessageSenderWithAuth extends HttpUrlConnectionMessageSender {
     protected void prepareConnection(HttpURLConnection connection)
             throws IOException {
 
-        connection.setRequestProperty("Authorization", "Basic c2h1Y2h1bnplbmU6MVNhbGVzZm9yY2UhIQ==");
+        connection.setRequestProperty("Authorization", "Basic <token>");
 
         super.prepareConnection(connection);
     }
