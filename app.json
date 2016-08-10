@@ -1,0 +1,57 @@
+{
+  "name": "Licensing+",
+  "description": "This app provides nipr integration to salesforce.",
+  "keywords": [
+    "productivity",
+    "java",
+    "salesforce",
+    "NIPR"
+  ],
+  "website": "https://www.zenefits.com/",
+  "repository": "https://github.com/zenefits/licensingplus-heroku-java",
+  "logo": "",
+  "success_url": "/",
+  "env": {
+    "NIPR_ALERT_ENDPOINT": "https://pdb-services.nipr.com/pdb-alerts-industry-services/services/industry-ws",
+    "NIPR_USERNAME": "",
+    "NIPR_PASSWORD": "",
+    "SALESFORCE_USERNAME": "",
+    "SALESFORCE_PASSWORD": "",
+    "SALESFORCE_CONSUMER_KEY": "",
+    "SALESFORCE_CONSUMER_SECRET": "",
+    "TZ": "America/Los_Angeles",
+    "EMAIL_RECIPIENT": "",
+    "JAVA_TOOL_OPTIONS": "-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+UseConcMarkSweepGC"
+  },
+  "formation": {
+      "web": {
+        "quantity": 1,
+        "size": "hobby"
+      }
+  },
+  "addons": [
+    {
+      "plan":"logentries:le_tryit"
+    },
+    {
+      "plan": "heroku-postgresql:hobby-basic"
+    },
+    {
+      "plan": "newrelic:wayne"
+    },
+    {
+      "plan": "proximo:development"
+    },
+    {
+      "plan": "scheduler:standard"
+    },
+    {
+      "plan": "sendgrid:starter"
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-java"
+    }
+  ]
+}
