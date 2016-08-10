@@ -30,7 +30,7 @@ public class SalesForceClient {
 
         boolean lSuccess = false;
         OAuthResponse lResponse = null;
-        String lFormEncoded = "";
+        String lFormEncoded = "<FormDATA>";
         HttpHeaders lHeaders = new HttpHeaders();
         lHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         // send request and parse result

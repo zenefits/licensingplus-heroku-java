@@ -44,6 +44,28 @@ public class LicenseInternal {
         isActive = false;
     }
 
+    public LicenseInternal GetCopy() {
+        LicenseInternal lClone = new LicenseInternal();
+        lClone.npnNumber = this.npnNumber;
+        lClone.state = this.state;
+        lClone.licenseNumber = this.licenseNumber;
+        lClone.effectiveDate = this.effectiveDate;
+        lClone.expirationDate = this.expirationDate;
+        lClone.className = this.className;
+        lClone.isResidentLicense = this.isResidentLicense;
+        lClone.isActive = this.isActive;
+        lClone.niprUpdateDate = this.niprUpdateDate;
+        lClone.lastErrorCode = this.lastErrorCode;
+        lClone.lastErrorMessage = this.lastErrorMessage;
+
+        lClone.linesOfAuthority = new ArrayList<LineOfAuthorityInternal>();
+        for(LineOfAuthorityInternal loa : this.linesOfAuthority) {
+            lClone.linesOfAuthority.add(loa.GetCopy());
+        }
+
+        return lClone;
+    }
+
     public String GetKey() {
         return npnNumber + ";" + licenseNumber + ";" + CalenderUtils.GetSdfcStateName(state) + ";" + CalenderUtils.GetSFDCResponseDateFormat(effectiveDate);
     }

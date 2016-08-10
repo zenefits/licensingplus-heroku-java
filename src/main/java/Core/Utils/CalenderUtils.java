@@ -135,7 +135,7 @@ public class CalenderUtils {
     }
 
     public static boolean isNullOrWhiteSpace(String a) {
-        return a == null || (a.length() > 0 && a.trim().length() <= 0);
+        return a == null || (a.length() <= 0) || (a.length() > 0 && a.trim().length() <= 0);
     }
 
     public static String GetFormattedDate(GregorianCalendar aInCal) {
@@ -164,5 +164,33 @@ public class CalenderUtils {
         }
 
         return aInCode;
+    }
+
+    public static HashMap<String, GregorianCalendar> GetLastNDays(int aInN) {
+
+        HashMap<String, GregorianCalendar> lDays = new HashMap<String, GregorianCalendar>();
+        GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();
+        while(aInN > 0) {
+
+            // Skip Holidays and weekends
+            UpdateCalenderDate(lCal);
+            String lFormattedDate = GetFormattedDate(lCal);
+            lDays.put(lFormattedDate, lCal);
+
+            aInN--;
+            lCal = (GregorianCalendar)lCal.clone();
+            lCal.add(GregorianCalendar.DATE, -1);
+        }
+        return lDays;
+    }
+
+    public static void UpdateCalenderDate(GregorianCalendar aInCal) {
+        String lDayName = aInCal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
+        if(Objects.equals(lDayName, new String("Sun"))){
+            aInCal.add(GregorianCalendar.DATE, -2);
+        }
+        else if(Objects.equals(lDayName, new String("Sat"))) {
+            aInCal.add(GregorianCalendar.DATE, -1);
+        }
     }
 }

@@ -13,6 +13,13 @@ public class LineOfAuthorityInternal {
         this.isActive = false;
     }
 
+    public LineOfAuthorityInternal GetCopy() {
+        LineOfAuthorityInternal loa = new LineOfAuthorityInternal();
+        loa.isActive = this.isActive;
+        loa.name = this.name;
+        return loa;
+    }
+
     @Override
     public String toString() {
         return "LineOfAuthorityInternal{" +

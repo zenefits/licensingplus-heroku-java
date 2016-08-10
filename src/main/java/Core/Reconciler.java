@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Reconciler extends Thread {
 
-    static HashMap<String, LicenseInternal> UnprocessedLicenses = new HashMap<String, LicenseInternal>();
     static int MAX_DAYS_RECONCILE = 2;
     static int SALES_FORCE_API_BATCH = 30;
     SalesForceClient SfClient = null;
@@ -27,82 +26,87 @@ public class Reconciler extends Thread {
         SfClient = new SalesForceClient("https://test.salesforce.com/services/oauth2/token");
         SfClient.Login();
 
-        boolean lFullNiprSync = true;
+        HashMap<String, GregorianCalendar> lDaysToSync = CalenderUtils.GetLastNDays(MAX_DAYS_RECONCILE);
+
         NiprClient lClient = NiprClientConfiguration.GetNiprClient();
         GregorianCalendar lLastSuccessCall = null;
         while(true) {
 
+            // Get the latest copy. This is a Deep Copy
+            HashMap<String, LicenseInternal> lUnprocessedLicenses = LicenseDB.GetUnprocessedLicenses();
+
+            GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();
+            if(!CalenderUtils.IsCalenderDaySame(lLastSuccessCall, lCal)) {
+                System.out.println("Reconciler: Last successful call is not today, adding today's date");
+                lDaysToSync.put(CalenderUtils.GetFormattedDate(lCal), lCal);
+            }
+            else {
+                System.out.println("Reconciler: Last successful call is for today ...");
+            }
+
             try
             {
                 HashMap<String, LicenseInternal> lLicenses = new HashMap<String, LicenseInternal>();
-                if(lFullNiprSync) {
-                    System.out.println("Reconciler: Attempting a full Nipr Sync");
-                    // Get all information
-                    AtomicBoolean lFailure = new AtomicBoolean(false);
-                    lLicenses = lClient.GetAllNiprReports(MAX_DAYS_RECONCILE, lFailure);
-                    if(lFailure.get()) {
-                        System.out.println("Reconciler: There were failures in getting a full sync on GetAllNiprReport");
-                    }
-                    else {
-                        lFullNiprSync = false;
-                        lLastSuccessCall = (GregorianCalendar) GregorianCalendar.getInstance();
-                        System.out.println("Reconciler: Success getting a full sync on GetAllNiprReport");
-                    }
-                }
-                else {
-                    GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();
+                lLastSuccessCall = DoNiprSync(lClient, lDaysToSync, lUnprocessedLicenses, lLicenses);
 
-                    // No need to update the licenses as we already sync'd today
-                    if(!CalenderUtils.IsCalenderDaySame(lLastSuccessCall, lCal)) {
-
-                        if (CalenderUtils.IsWeekEnd(lCal)) {
-
-                            System.out.println("Reconciler: Skipping NIPR Report for " + CalenderUtils.GetFormattedDate(lCal));
-                            continue;
-                        }
-
-                        System.out.println("Reconciler: NIPR Report daily sync for " + CalenderUtils.GetFormattedDate(lCal));
-
-                        AtomicBoolean lFailure = new AtomicBoolean(false);
-                        lLicenses = lClient.GetSpecificReport(lCal, lFailure);
-                        if(!lFailure.get()) {
-                            lLastSuccessCall = lCal;
-                            System.out.println("Reconciler: NIPR Report succeeded for " + CalenderUtils.GetFormattedDate(lCal));
-                        }
-                        else {
-                            System.out.println("Reconciler: NIPR Report failed for " + CalenderUtils.GetFormattedDate(lCal));
-                        }
-                    }
-                    else {
-                        System.out.println("Reconciler: Nipr Sync for today " + CalenderUtils.GetFormattedDate(lCal) + " is done");
-                    }
-
-                }
-
-                System.out.println("Reconciler: Current new licenses " + lLicenses.size() + " Older unprocessed licenses " + UnprocessedLicenses.size());
-                // Merge the current info with unprocessed
-                lClient.MergeReports(UnprocessedLicenses, lLicenses);
-                System.out.println("Reconciler: Combined licenses to be processed in Sales Force " + lLicenses.size());
-
+                System.out.println("Reconciler: " + lLicenses.size() + " new licenses to be processed in Sales Force ");
                 if(lLicenses.size() > 0) {
 
                     // Process information in sales force, save the remaining for next run
-                    UnprocessedLicenses = ProcessInfoInSalesForce(lLicenses);
+                    lUnprocessedLicenses = ProcessInfoInSalesForce(lLicenses);
                 }
-                else {
-                    System.out.println("Reconciler: No new licenses to be processed in Sales Force ");
 
-                }
+                System.out.println("Reconciler: Total Failed licenses in in the system " + lUnprocessedLicenses.size());
+
+                // This transfers reference, do not use the map after this call but get a fresh copy.
+                // Update in the cache, which also serves the UI
+                LicenseDB.SetUnprocessedLicenses(lUnprocessedLicenses);
                 System.out.println("Reconciler: Sleeping");
-                sleep(10000);
+                sleep(600000);
             }
             catch (Exception ex)
             {
                 // Force Sync if something goes wrong
-                lFullNiprSync = false;
+                lDaysToSync = CalenderUtils.GetLastNDays(5);
                 System.out.println("Reconciler mainloop threw an exception " + ex.getMessage());
             }
         }
+    }
+
+    public GregorianCalendar DoNiprSync(
+            NiprClient aInClient,
+            HashMap<String, GregorianCalendar> aInOutDaysToSync,
+            HashMap<String, LicenseInternal> aInExistingLicenses,
+            HashMap<String, LicenseInternal> aInOutLicenses)
+    {
+        GregorianCalendar lLastSuccessCall = null;
+        try {
+
+            System.out.println("Reconciler: Attempting a Nipr Sync for " + aInOutDaysToSync.size() + " days");
+            // Get all information
+            AtomicBoolean lFailure = new AtomicBoolean(false);
+            if(aInOutDaysToSync.size() > 0) {
+
+                aInClient.GetNiprReports(aInOutDaysToSync, aInOutLicenses);
+                if (lFailure.get()) {
+                    System.out.println("Reconciler: Nipr Sync failures in doing " + aInOutDaysToSync.size() + " days sync");
+                } else {
+                    System.out.println("Reconciler: Nipr Sync success in doing " + aInOutDaysToSync.size() + " days sync");
+                    aInOutDaysToSync.clear();
+                    lLastSuccessCall = (GregorianCalendar) GregorianCalendar.getInstance();
+                }
+            }
+
+            System.out.println("Reconciler: Current new licenses " + aInOutLicenses.size() + " Older unprocessed licenses " + aInExistingLicenses.size());
+            // Merge the current info with unprocessed
+            aInClient.MergeReports(aInExistingLicenses, aInOutLicenses);
+            System.out.println("Reconciler: Combined licenses to be processed in Sales Force " + aInOutLicenses.size());
+
+        }
+        catch (Exception ex) {
+            System.out.println("Reconciler: Exception in calling NiprClient " + ex.getMessage());
+        }
+        return lLastSuccessCall;
     }
 
     public HashMap<String, LicenseInternal> ProcessInfoInSalesForce(HashMap<String, LicenseInternal> aInLicenses) {
@@ -131,7 +135,6 @@ public class Reconciler extends Thread {
             PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true);
         }
 
-        System.out.println("Total  Failed license in Sales Force " + lFailedRequests.size());
         return lFailedRequests;
     }
 
@@ -190,6 +193,7 @@ public class Reconciler extends Thread {
     }
 
     private List<LicenseInternal>  GetOrderLicenses(HashMap<String, LicenseInternal> aInLicenses) {
+
         List<LicenseInternal> lResidentLicenses = new ArrayList<LicenseInternal>();
         List<LicenseInternal> lNonResidentLicenses = new ArrayList<LicenseInternal>();
         for(LicenseInternal lLicense : aInLicenses.values()) {

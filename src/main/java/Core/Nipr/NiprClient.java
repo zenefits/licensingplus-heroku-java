@@ -31,64 +31,37 @@ public class NiprClient extends WebServiceGatewaySupport {
         SyncedDates = new HashSet<String>();
     }
 
-    public HashMap<String, LicenseInternal> GetAllNiprReports(int aInDays, AtomicBoolean aOutFailure) {
+    public boolean GetNiprReports(
+            HashMap<String, GregorianCalendar> aInDates,
+            HashMap<String, LicenseInternal> aInOutLatestLicenses)
+    {
 
-        aOutFailure.set(false);
-        HashMap<String, LicenseInternal> lLatestInfo = new  HashMap<String, LicenseInternal>();
+        boolean lFailure = false;
         HashMap<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
-        GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();
-        while(aInDays > 0) {
 
-            UpdateCalenderDate(lCal);
+        for(GregorianCalendar lCal : aInDates.values()) {
+
             String lFormattedDate = CalenderUtils.GetFormattedDate(lCal);
-            if(SyncedDates.contains(lFormattedDate)) {
-                System.out.println("Skipping Nipr sync for " + lFormattedDate);
-                continue;
-            }
+            System.out.println("NiprClient: Get data for " + lFormattedDate);
 
-            AtomicBoolean lFailure = new AtomicBoolean(false);
-            lCurrentDayInfo = GetSpecificReport(lCal, lFailure);
+            AtomicBoolean lSpecificFailure = new AtomicBoolean(false);
+            lCurrentDayInfo = GetSpecificReport(lCal, lSpecificFailure);
 
-            if(lFailure.get()) {
+            if(lSpecificFailure.get()) {
                 System.out.println("Nipr Sync for date " + lFormattedDate + " failed");
-                aOutFailure.set(true);
+                lFailure = true;
                 continue;
             }
 
             System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS");
 
-            if(!SyncedDates.contains(lFormattedDate)) {
-                SyncedDates.add(lFormattedDate);
-            }
-
             // Previous Day is higher
-            MergeReports(lCurrentDayInfo, lLatestInfo);
-
-            // Now all information is in LatestInfo
-
-            lCal.add(GregorianCalendar.DATE, -1);
-
-            aInDays--;
+            MergeReports(lCurrentDayInfo, aInOutLatestLicenses);
         }
 
-        for(LicenseInternal lLicense : lLatestInfo.values()) {
-            System.out.println("Final Processed License " + lLicense.toString());
-        }
-
-        System.out.println("Grand Total Licenses " + lLatestInfo.size());
-        return lLatestInfo;
+        return lFailure;
     }
 
-    public void UpdateCalenderDate(GregorianCalendar aInCal) {
-        String lDayName = aInCal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
-
-        if(Objects.equals(lDayName, new String("Sun"))){
-            aInCal.add(GregorianCalendar.DATE, -2);
-        }
-        else if(Objects.equals(lDayName, new String("Sat"))) {
-            aInCal.add(GregorianCalendar.DATE, -1);
-        }
-    }
 
     public void MergeReports(HashMap<String, LicenseInternal> aInDateInfo1, HashMap<String, LicenseInternal> aInDateInfo2) {
 
