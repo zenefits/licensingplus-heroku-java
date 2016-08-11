@@ -9,7 +9,6 @@
   ],
   "website": "https://www.zenefits.com/",
   "repository": "https://github.com/zenefits/licensingplus-heroku-java",
-  "logo": "",
   "success_url": "/",
   "env": {
     "NIPR_ALERT_ENDPOINT": "https://pdb-services.nipr.com/pdb-alerts-industry-services/services/industry-ws",
