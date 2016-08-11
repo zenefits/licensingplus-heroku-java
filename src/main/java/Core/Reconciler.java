@@ -24,10 +24,9 @@ public class Reconciler extends Thread {
 
         System.out.println("Reconciler: Started the reconciler thread");
         SfClient = new SalesForceClient("https://test.salesforce.com/services/oauth2/token", Configuration.GetSalesForceAuthInfo());
-        SfClient.Login();
-
         NiprClient lClient = NiprClientConfiguration.GetNiprClient(Configuration.GetNiprAuthToken());
-        GregorianCalendar lLastSuccessCall = null;
+        int lRetryInterval = Configuration.GetRetryInterval();
+
         while(true) {
 
             try
@@ -56,8 +55,8 @@ public class Reconciler extends Thread {
 
                 LicenseDB.RemoveNiprSyncDates(lSuccessDates);
 
-                System.out.println("Reconciler: Sleeping");
-                sleep(10000);
+                System.out.println("Reconciler: Sleeping for " + lRetryInterval + "ms");
+                sleep(lRetryInterval);
             }
             catch (Exception ex)
             {
