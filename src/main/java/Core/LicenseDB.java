@@ -4,10 +4,7 @@ import Core.Nipr.LicenseInternal;
 import Core.Utils.CalenderUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -20,7 +17,76 @@ public class LicenseDB {
     private static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private static final Lock readLock = readWriteLock.readLock();
     private static final Lock writeLock = readWriteLock.writeLock();
+    static int MAX_DAYS_RECONCILE = 2;
     private static HashMap<String, LicenseInternal> UnprocessedLicenses = new HashMap<String, LicenseInternal>();
+    private static HashMap<String, GregorianCalendar> PendingNiprSyncDates = new HashMap<String, GregorianCalendar>();
+    private static GregorianCalendar LastSuccessfullSync = null;
+
+    static  {
+        PendingNiprSyncDates = CalenderUtils.GetLastNDays(MAX_DAYS_RECONCILE);
+    }
+
+    public static HashMap<String, GregorianCalendar> GetPendingNiprSyncDates() {
+
+        HashMap<String, GregorianCalendar> lNiprSyncDates = new HashMap<String, GregorianCalendar>();
+
+        readLock.lock();
+        try {
+
+            GregorianCalendar lToday = (GregorianCalendar) GregorianCalendar.getInstance();
+            if(!CalenderUtils.IsCalenderDaySame(lToday, LastSuccessfullSync)) {
+                System.out.println("Reconciler: Last successful call is not today, adding today's date");
+                PendingNiprSyncDates.put(CalenderUtils.GetFormattedDate(lToday), lToday);
+            }
+            else {
+                System.out.println("Reconciler: TodaysSuccessfulSync has been done ...");
+            }
+
+            for (GregorianCalendar lCal : PendingNiprSyncDates.values()) {
+                GregorianCalendar lCopy = (GregorianCalendar)lCal.clone();
+                lNiprSyncDates.put(CalenderUtils.GetFormattedDate(lCopy), lCopy);
+            }
+        }
+        finally {
+            readLock.unlock();
+        }
+
+        return lNiprSyncDates;
+    }
+
+    public static void UpdateNiprSyncDates(String aInDate) {
+        System.out.println("LicenseDB: Adding date " + aInDate + " for Nipr Sync");
+        writeLock.lock();
+        try {
+            GregorianCalendar lCal = CalenderUtils.GetCalenderTimeFromString(aInDate);
+            PendingNiprSyncDates.put(CalenderUtils.GetFormattedDate(lCal), lCal);
+        }
+        finally {
+            writeLock.unlock();
+        }
+    }
+
+    public static void RemoveNiprSyncDates(HashMap<String, GregorianCalendar> aInSuccessDates) {
+
+        GregorianCalendar lToday = (GregorianCalendar) GregorianCalendar.getInstance();
+        writeLock.lock();
+        try {
+            for(GregorianCalendar lCal : aInSuccessDates.values()) {
+
+                String lKey = CalenderUtils.GetFormattedDate(lCal);
+                System.out.println("LicenseDB: Removing date " + lKey + " for Nipr Sync");
+                PendingNiprSyncDates.remove(lKey);
+
+                if(CalenderUtils.IsCalenderDaySame(lToday, lCal)) {
+                    System.out.println("LicenseDB: Today date " + CalenderUtils.GetFormattedDate(lCal) + " success for Nipr Sync");
+                    LastSuccessfullSync = lToday;
+                }
+            }
+        }
+        finally {
+            writeLock.unlock();
+        }
+    }
 
     public static HashMap<String, LicenseInternal> GetUnprocessedLicenses() {
 
