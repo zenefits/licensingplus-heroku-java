@@ -12,6 +12,9 @@ public class Application {
 
     public static void main(String[] args) {
 
+        // Read ENV Variables
+        Configuration.LoadParams();
+
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
 
         System.out.println("Launching the reconciler thread");

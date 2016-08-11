@@ -12,6 +12,11 @@ import java.net.HttpURLConnection;
 
 public class NiprClientConfiguration {
 
+    private static String niprAuthToken;
+
+    public static String getNiprAuthToken() {
+        return niprAuthToken;
+    }
     public static Jaxb2Marshaller GetMarshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setContextPath("nipr.wsdl");
@@ -19,8 +24,8 @@ public class NiprClientConfiguration {
         return marshaller;
     }
 
-    public static NiprClient GetNiprClient() {
-
+    public static NiprClient GetNiprClient(String aInNiprAuthToken) {
+        niprAuthToken = aInNiprAuthToken;
         Jaxb2Marshaller lMarshaller = NiprClientConfiguration.GetMarshaller();
 
         NiprClient client = new NiprClient();

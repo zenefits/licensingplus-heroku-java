@@ -1,0 +1,81 @@
+package Core;
+
+import Core.Utils.CalenderUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+/**
+ * Created by vthiruvengadam on 8/10/16.
+ */
+public class Configuration {
+
+    private static final String niprUserNameField = "NIPR_USERNAME";
+    private static String niprUsername;
+
+    private static final String niprPasswordField = "NIPR_PASSWORD";
+    private static String niprPassword;
+
+    private static final String salesForceConsumerKeyField = "SALESFORCE_CONSUMER_KEY";
+    private static String salesForceConsumerKey;
+
+    private static final String salesForceConsumerSecretField = "SALESFORCE_CONSUMER_SECRET";
+    private static String salesForceConsumerSecret;
+
+    private static final String salesForceUsernameField = "SALESFORCE_USERNAME";
+    private static String salesForceUsername;
+
+    private static final String salesForcePasswordField = "SALESFORCE_PASSWORD";
+    private static String salesForcePassword;
+
+
+
+    public static void LoadParams() {
+
+        niprUsername = System.getenv(niprUserNameField);
+        ThrowIfEmpty(niprUserNameField, niprUsername);
+
+        niprPassword = System.getenv(niprPasswordField);
+        ThrowIfEmpty(niprPasswordField, niprPassword);
+
+        salesForceConsumerKey = System.getenv(salesForceConsumerKeyField);
+        ThrowIfEmpty(salesForceConsumerKeyField, salesForceConsumerKey);
+
+        salesForceConsumerSecret = System.getenv(salesForceConsumerSecretField);
+        ThrowIfEmpty(salesForceConsumerSecretField, salesForceConsumerSecret);
+
+        salesForceUsername = System.getenv(salesForceUsernameField);
+        ThrowIfEmpty(salesForceUsernameField, salesForceUsername);
+
+        salesForcePassword = System.getenv(salesForcePasswordField);
+        ThrowIfEmpty(salesForcePasswordField, salesForcePassword);
+    }
+
+    public static String GetNiprAuthToken() {
+        String lVal = niprUsername + ":" + niprPassword;
+        byte[] encodedBytes = Base64.encodeBase64(lVal.getBytes());
+        return "Basic " + new String(encodedBytes);
+    }
+
+    public static String GetSalesForceAuthInfo(){
+        String lInfo = "";
+        try {
+            // grant_type=password&client_id=<SALESFORCE_CONSUMER_KEY>&client_secret=<SALESFORCE_CONSUMER_SECRET>&username=<SALESFORCE_USERNAME>&password=<SALESFORCE_PASSWORD>
+            lInfo = "grant_type=password&client_id=" + salesForceConsumerKey + "&client_secret=" +
+                    salesForceConsumerSecret + "&username=" + salesForceUsername + "&password=" + URLEncoder.encode(salesForcePassword, "UTF-8");
+            return lInfo;
+        }
+        catch(Exception ex) {
+            System.out.println("Failed to url encode sales force auth info");
+        }
+        return lInfo;
+    }
+
+    public static void ThrowIfEmpty(String aInDataField, String aInData) {
+
+        if(CalenderUtils.isNullOrWhiteSpace(aInData)) {
+            throw new IllegalArgumentException("ENV Field " + aInDataField + " is not set");
+        }
+    }
+}

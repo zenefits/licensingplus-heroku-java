@@ -20,17 +20,19 @@ public class SalesForceClient {
     private String AuthToken;
     private String SyncUrl;
     private String SyncUrlSuffix = "services/apexrest/nipr/license";
+    private String FormEncodedAuthInfo;
 
-    public SalesForceClient(String aInAuthUrl) {
+    public SalesForceClient(String aInAuthUrl, String aInAuthInfo) {
         AuthUrl = aInAuthUrl;
         AuthToken = "";
+        FormEncodedAuthInfo = aInAuthInfo;
     }
 
     public boolean Login() {
 
         boolean lSuccess = false;
         OAuthResponse lResponse = null;
-        String lFormEncoded = "<FormDATA>";
+        String lFormEncoded = FormEncodedAuthInfo;
         HttpHeaders lHeaders = new HttpHeaders();
         lHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         // send request and parse result
@@ -43,7 +45,6 @@ public class SalesForceClient {
             if(lResponse != null) {
                 AuthToken = lResponse.getAccess_token();
                 SyncUrl = lResponse.getInstance_url() + "/services/apexrest/nipr/license";
-                System.out.println("SalesForceClient: Auth Token " + AuthToken);
                 lSuccess = true;
             }
         } else if (loginResponse.getStatusCode() == HttpStatus.UNAUTHORIZED) {

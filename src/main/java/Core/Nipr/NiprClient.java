@@ -31,12 +31,12 @@ public class NiprClient extends WebServiceGatewaySupport {
         SyncedDates = new HashSet<String>();
     }
 
-    public boolean GetNiprReports(
+    public void GetNiprReports(
             HashMap<String, GregorianCalendar> aInDates,
-            HashMap<String, LicenseInternal> aInOutLatestLicenses)
+            HashMap<String, LicenseInternal> aInOutLatestLicenses,
+            HashMap<String, GregorianCalendar> aOutSuccessDates)
     {
 
-        boolean lFailure = false;
         HashMap<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
 
         for(GregorianCalendar lCal : aInDates.values()) {
@@ -49,7 +49,6 @@ public class NiprClient extends WebServiceGatewaySupport {
 
             if(lSpecificFailure.get()) {
                 System.out.println("Nipr Sync for date " + lFormattedDate + " failed");
-                lFailure = true;
                 continue;
             }
 
@@ -57,9 +56,9 @@ public class NiprClient extends WebServiceGatewaySupport {
 
             // Previous Day is higher
             MergeReports(lCurrentDayInfo, aInOutLatestLicenses);
+            GregorianCalendar lCalCopy = (GregorianCalendar)lCal.clone();
+            aOutSuccessDates.put(CalenderUtils.GetFormattedDate(lCalCopy), lCalCopy);
         }
-
-        return lFailure;
     }
 
 

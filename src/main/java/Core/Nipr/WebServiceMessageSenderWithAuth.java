@@ -14,7 +14,7 @@ class WebServiceMessageSenderWithAuth extends HttpUrlConnectionMessageSender {
     protected void prepareConnection(HttpURLConnection connection)
             throws IOException {
 
-        connection.setRequestProperty("Authorization", "Basic <Token>");
+        connection.setRequestProperty("Authorization", NiprClientConfiguration.getNiprAuthToken());
 
         super.prepareConnection(connection);
     }
