@@ -17,13 +17,12 @@ public class LicenseDB {
     private static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private static final Lock readLock = readWriteLock.readLock();
     private static final Lock writeLock = readWriteLock.writeLock();
-    static int MAX_DAYS_RECONCILE = 2;
     private static HashMap<String, LicenseInternal> UnprocessedLicenses = new HashMap<String, LicenseInternal>();
     private static HashMap<String, GregorianCalendar> PendingNiprSyncDates = new HashMap<String, GregorianCalendar>();
     private static GregorianCalendar LastSuccessfullSync = null;
 
     static  {
-        PendingNiprSyncDates = CalenderUtils.GetLastNDays(MAX_DAYS_RECONCILE);
+        PendingNiprSyncDates = CalenderUtils.GetLastNDays(Configuration.GetResyncDaysCount());
     }
 
     public static HashMap<String, GregorianCalendar> GetPendingNiprSyncDates() {
@@ -54,16 +53,26 @@ public class LicenseDB {
         return lNiprSyncDates;
     }
 
-    public static void UpdateNiprSyncDates(String aInDate) {
+    public static void AddNiprSyncDate(String aInDate) {
         System.out.println("LicenseDB: Adding date " + aInDate + " for Nipr Sync");
+        GregorianCalendar lCal = CalenderUtils.GetCalenderTimeFromString(aInDate);
         writeLock.lock();
         try {
-            GregorianCalendar lCal = CalenderUtils.GetCalenderTimeFromString(aInDate);
             PendingNiprSyncDates.put(CalenderUtils.GetFormattedDate(lCal), lCal);
         }
         finally {
             writeLock.unlock();
         }
+    }
+
+    public static void RemoveNiprSyncDate(String aInDate) {
+
+        System.out.println("LicenseDB: Removing Nipr Sync date " + aInDate);
+        GregorianCalendar lCal = CalenderUtils.GetCalenderTimeFromString(aInDate);
+        HashMap<String, GregorianCalendar> lDates = new HashMap<String, GregorianCalendar>();
+        lDates.put(CalenderUtils.GetFormattedDate(lCal), lCal);
+
+        RemoveNiprSyncDates(lDates);
     }
 
     public static void RemoveNiprSyncDates(HashMap<String, GregorianCalendar> aInSuccessDates) {
@@ -78,7 +87,7 @@ public class LicenseDB {
                 PendingNiprSyncDates.remove(lKey);
 
                 if(CalenderUtils.IsCalenderDaySame(lToday, lCal)) {
-                    System.out.println("LicenseDB: Today date " + CalenderUtils.GetFormattedDate(lCal) + " success for Nipr Sync");
+                    System.out.println("LicenseDB: Today date " + CalenderUtils.GetFormattedDate(lCal) + " is in the dates to be removed, marking last sync as today");
                     LastSuccessfullSync = lToday;
                 }
             }

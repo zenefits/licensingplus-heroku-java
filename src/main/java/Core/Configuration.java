@@ -29,7 +29,22 @@ public class Configuration {
     private static final String salesForcePasswordField = "SALESFORCE_PASSWORD";
     private static String salesForcePassword;
 
+    private static final String reconcilerRetryField = "RETRY_INTERVAL";
+    private static int reconcilerRetry;
 
+    private static final String resyncDaysCountField = "RESYNC_DAYS_COUNT";
+    private static int resyncDaysCount;
+
+    private static final int DefaultResyncDaysCount = 5;
+    private static final int MaxResyncDaysCount = 14;
+
+    public static int GetRetryInterval() {
+        return reconcilerRetry;
+    }
+
+    public static int GetResyncDaysCount() {
+        return resyncDaysCount;
+    }
 
     public static void LoadParams() {
 
@@ -50,6 +65,29 @@ public class Configuration {
 
         salesForcePassword = System.getenv(salesForcePasswordField);
         ThrowIfEmpty(salesForcePasswordField, salesForcePassword);
+
+        String lInterval = System.getenv(reconcilerRetryField);
+        if(CalenderUtils.isNullOrWhiteSpace(lInterval)) {
+            reconcilerRetry = 60000; // Every minute
+        }
+        else {
+            reconcilerRetry = Integer.parseInt(lInterval);
+        }
+
+        String lDays = System.getenv(resyncDaysCountField);
+        if(CalenderUtils.isNullOrWhiteSpace(lInterval)) {
+            resyncDaysCount = DefaultResyncDaysCount; // Every minute
+        }
+        else {
+            resyncDaysCount = Integer.parseInt(lInterval);
+            if(resyncDaysCount > MaxResyncDaysCount) {
+                // We cannot go back beyond MaxResyncDaysCount = 14
+                resyncDaysCount = MaxResyncDaysCount;
+            }
+            else if(resyncDaysCount < 0) {
+                resyncDaysCount = DefaultResyncDaysCount;
+            }
+        }
     }
 
     public static String GetNiprAuthToken() {

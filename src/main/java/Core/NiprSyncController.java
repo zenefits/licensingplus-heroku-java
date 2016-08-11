@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-public class HelloController {
+public class NiprSyncController {
 
     @RequestMapping("/")
     public String index() {
-
+        // TODO: Load the HTML FILE and return
         return "Welcome to LicensePlus Nipr Sync Portal";
     }
 
@@ -29,9 +29,14 @@ public class HelloController {
         return new ArrayList<String>(lNiprSyncDates.keySet());
     }
 
-    @RequestMapping(value = "/updateNiprSyncDate/{date}", method = RequestMethod.POST)
-    public void updateNiprSyncDate(@PathVariable String date) {
-        LicenseDB.UpdateNiprSyncDates(date);
+    @RequestMapping(value = "/AddNiprSyncDate/{date}", method = RequestMethod.POST)
+    public void AddNiprSyncDate(@PathVariable String date) {
+        LicenseDB.AddNiprSyncDate(date);
+    }
+
+    @RequestMapping(value = "/RemoveNiprSyncDate/{date}", method = RequestMethod.POST)
+    public void RemoveNiprSyncDate(@PathVariable String date) {
+        LicenseDB.AddNiprSyncDate(date);
     }
 
 }

@@ -28,7 +28,7 @@ public class SalesForceClient {
         FormEncodedAuthInfo = aInAuthInfo;
     }
 
-    public boolean Login() {
+    private boolean Login() {
 
         boolean lSuccess = false;
         OAuthResponse lResponse = null;
