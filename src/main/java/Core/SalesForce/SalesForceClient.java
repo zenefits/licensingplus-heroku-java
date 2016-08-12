@@ -66,14 +66,15 @@ public class SalesForceClient {
         if(CalenderUtils.isNullOrWhiteSpace(AuthToken)) {
             boolean lSuccess = Login();
         }
-
+        String lJsonData = "";
+        String lToken = "Bearer " + AuthToken;
         try {
             ObjectMapper lMapper = new ObjectMapper();
-            String lJsonData = lMapper.writeValueAsString(aInLicenses);
+            lJsonData = lMapper.writeValueAsString(aInLicenses);
 
             HttpHeaders lHeaders = new HttpHeaders();
             lHeaders.setContentType(MediaType.APPLICATION_JSON);
-            String lToken = "Bearer " + AuthToken;
+
             lHeaders.set("Authorization", lToken);
             // send request and parse result
             ResponseEntity<String> lResponse = WebUtils.PostData(

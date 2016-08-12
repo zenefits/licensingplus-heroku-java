@@ -116,7 +116,10 @@ public class NiprClient extends WebServiceGatewaySupport {
         catch(Exception e)
         {
             aOutFailure.set(true);
-            System.out.println("NIPR soap api threw an exception " + e.getMessage());
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+
+            System.out.println("NIPR soap api threw an exception " + errors.toString());
         }
 
         return lAllLicenses;
