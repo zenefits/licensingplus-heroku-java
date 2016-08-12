@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.xml.bind.*;
 
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.soap.client.SoapFaultClientException;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 
 public class NiprClient extends WebServiceGatewaySupport {
@@ -113,13 +114,16 @@ public class NiprClient extends WebServiceGatewaySupport {
             lAllLicenses = ParseReport(lType.getAlertsReport().getInputStream(), lXmlDate);
             System.out.println("Total NIPR Liceses for " + formatted + " are " + lAllLicenses.size());
         }
-        catch(Exception e)
+        catch (SoapFaultClientException e)
         {
             aOutFailure.set(true);
-            StringWriter errors = new StringWriter();
-            e.printStackTrace(new PrintWriter(errors));
-
-            System.out.println("NIPR soap api threw an exception " + errors.toString());
+            System.out.println("NiprSoapApi SoapFaultClientException  " + e.getFaultStringOrReason() + "   =====   " + e.getFaultCode());
+        }
+        catch (Exception e)
+        {
+            aOutFailure.set(true);
+            e.printStackTrace();
+            System.out.println("NiprSoapApi generic exception  " + e.getMessage());
         }
 
         return lAllLicenses;
