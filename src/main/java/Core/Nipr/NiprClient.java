@@ -17,8 +17,11 @@ import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.*;
+import javax.xml.transform.Source;
 
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.soap.SoapFaultDetail;
+import org.springframework.ws.soap.SoapFaultDetailElement;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 
@@ -117,7 +120,14 @@ public class NiprClient extends WebServiceGatewaySupport {
         catch (SoapFaultClientException e)
         {
             aOutFailure.set(true);
-            System.out.println("NiprSoapApi SoapFaultClientException  " + e.getFaultStringOrReason() + "   =====   " + e.getFaultCode());
+            try {
+                PdbAlertsFaultType lFaultType = GetDetailedFault(e);
+                System.out.println("NiprSoapApi error from server " + lFaultType.getMessage());
+            }
+            catch (Exception ex) {
+                System.out.println("NiprSoapApi SoapFaultClientException error in parsing the exception ");
+            }
+
         }
         catch (Exception e)
         {
@@ -127,6 +137,20 @@ public class NiprClient extends WebServiceGatewaySupport {
         }
 
         return lAllLicenses;
+    }
+
+    private PdbAlertsFaultType GetDetailedFault(SoapFaultClientException aInException) throws IOException {
+        SoapFaultDetail soapFaultDetail = aInException.getSoapFault().getFaultDetail();
+        // if there is no fault detail ...
+        if (soapFaultDetail == null) {
+            throw aInException;
+        }
+        // cannot simply use SoapFaultDetail.getSource() since it returns <detail> as root XML element
+        SoapFaultDetailElement detailElementChild = (SoapFaultDetailElement) soapFaultDetail.getDetailEntries().next();
+        Source detailSource = detailElementChild.getSource();
+        Object lFaultResponse = getWebServiceTemplate().getUnmarshaller().unmarshal(detailSource);
+        PdbAlertsFaultType lFaultType = (PdbAlertsFaultType)lFaultResponse;
+        return lFaultType;
     }
 
 
