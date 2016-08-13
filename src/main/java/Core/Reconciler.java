@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.*;
 import java.util.Calendar;
 import Core.Utils.*;
+
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -17,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Reconciler extends Thread {
 
-    static int SALES_FORCE_API_BATCH = 30;
+    static int SALES_FORCE_API_BATCH = 200;
     SalesForceClient SfClient = null;
 
     public void run() {
@@ -55,8 +57,9 @@ public class Reconciler extends Thread {
 
                 LicenseDB.RemoveNiprSyncDates(lSuccessDates);
 
-                System.out.println("Reconciler: Sleeping for " + lRetryInterval + "ms");
-                sleep(lRetryInterval);
+                System.out.println("Reconciler: Sleeping for 24 hrs");
+                //sleep(lRetryInterval);
+                TimeUnit.HOURS.sleep(24);
             }
             catch (Exception ex)
             {
