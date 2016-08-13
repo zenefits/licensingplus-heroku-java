@@ -122,12 +122,18 @@ public class NiprClient extends WebServiceGatewaySupport {
             aOutFailure.set(true);
             try {
                 PdbAlertsFaultType lFaultType = GetDetailedFault(e);
-                System.out.println("NiprSoapApi error from server " + lFaultType.getMessage());
+                if(lFaultType != null) {
+                    System.out.println("NiprSoapApi error from server " + lFaultType.getMessage());
+                    if(lFaultType.getErrorCode() == 5) {
+                        aOutFailure.set(false);
+                        System.out.println("Treating no Nipr alerts for the day " + formatted + " as SUCCESS ++++++++++");
+                    }
+                }
             }
             catch (Exception ex) {
+                aOutFailure.set(true);
                 System.out.println("NiprSoapApi SoapFaultClientException error in parsing the exception ");
             }
-
         }
         catch (Exception e)
         {
