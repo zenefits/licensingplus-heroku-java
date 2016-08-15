@@ -20,6 +20,7 @@ public class Application {
         System.out.println("Launching the reconciler thread");
 
         Reconciler lReconciler = new Reconciler();
+        LicenseDB.SetReconcilerThread(lReconciler);
         lReconciler.start();
     }
 

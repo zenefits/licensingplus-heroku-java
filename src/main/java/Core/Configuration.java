@@ -68,7 +68,7 @@ public class Configuration {
 
         String lInterval = System.getenv(reconcilerRetryField);
         if(CalenderUtils.isNullOrWhiteSpace(lInterval)) {
-            reconcilerRetry = 60000; // Every minute
+            reconcilerRetry = 3600000; // Every hour
         }
         else {
             reconcilerRetry = Integer.parseInt(lInterval);

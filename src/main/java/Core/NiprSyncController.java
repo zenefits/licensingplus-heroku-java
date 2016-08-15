@@ -39,4 +39,8 @@ public class NiprSyncController {
         LicenseDB.AddNiprSyncDate(date);
     }
 
+    @RequestMapping(value = "/TriggerResync", method = RequestMethod.POST)
+    public void TriggerResync() {
+        LicenseDB.TriggerResync();
+    }
 }

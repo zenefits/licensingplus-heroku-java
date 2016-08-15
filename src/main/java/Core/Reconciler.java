@@ -13,6 +13,7 @@ import Core.Utils.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by vthiruvengadam on 8/5/16.
@@ -20,6 +21,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Reconciler extends Thread {
 
     static int SALES_FORCE_API_BATCH = 200;
+    static long MIN_SLEEP_INTERVAL = 120000; // 2 Mins
+    static long SALES_FORCE_API_RETRY_INTERVAL = 1800000; // 30 mins
+    static int SALES_FORCE_API_MAX_COUNT = 5;
+
     SalesForceClient SfClient = null;
 
     public void run() {
@@ -27,12 +32,15 @@ public class Reconciler extends Thread {
         System.out.println("Reconciler: Started the reconciler thread");
         SfClient = new SalesForceClient("https://test.salesforce.com/services/oauth2/token", Configuration.GetSalesForceAuthInfo());
         NiprClient lClient = NiprClientConfiguration.GetNiprClient(Configuration.GetNiprAuthToken());
-        int lRetryInterval = Configuration.GetRetryInterval();
-
+        AtomicLong lRetryInterval = null;
+        UUID lResyncTriggerId = LicenseDB.GetResyncTriggerId();
         while(true) {
 
             try
             {
+                lRetryInterval = new AtomicLong(Configuration.GetRetryInterval());
+                lResyncTriggerId = LicenseDB.GetResyncTriggerId();
+                System.out.println("Reconciler: Current triggered Resync ID " + lResyncTriggerId);
                 // Get the latest copy. This is a Deep Copy
                 HashMap<String, LicenseInternal> lUnprocessedLicenses = LicenseDB.GetUnprocessedLicenses();
                 HashMap<String, GregorianCalendar> lDaysToSync = LicenseDB.GetPendingNiprSyncDates();
@@ -46,7 +54,7 @@ public class Reconciler extends Thread {
                 if(lLicenses.size() > 0) {
 
                     // Process information in sales force, save the remaining for next run
-                    lUnprocessedLicenses = ProcessInfoInSalesForce(lLicenses);
+                    lUnprocessedLicenses = ProcessInfoInSalesForce(lLicenses, lRetryInterval);
                 }
 
                 System.out.println("Reconciler: Total Failed licenses in in the system " + lUnprocessedLicenses.size());
@@ -57,9 +65,20 @@ public class Reconciler extends Thread {
 
                 LicenseDB.RemoveNiprSyncDates(lSuccessDates);
 
-                System.out.println("Reconciler: Sleeping for 24 hrs");
-                //sleep(lRetryInterval);
-                TimeUnit.HOURS.sleep(24);
+                UUID lLatestTriggerId = LicenseDB.GetResyncTriggerId();
+                if(lLatestTriggerId.compareTo(lResyncTriggerId) != 0) {
+                    System.out.println("Reconciler: Reconciler retrying with minimum sleep as resync triggered by user");
+                    Thread.sleep(MIN_SLEEP_INTERVAL);
+                    continue;
+                }
+
+                System.out.println("Reconciler: Sleeping for " + lRetryInterval + "ms");
+                try {
+                    Thread.sleep(lRetryInterval.get());
+                }
+                catch (InterruptedException lIntrEx) {
+                    System.out.println("Reconciler: interrupted");
+                }
             }
             catch (Exception ex)
             {
@@ -95,7 +114,10 @@ public class Reconciler extends Thread {
         }
     }
 
-    public HashMap<String, LicenseInternal> ProcessInfoInSalesForce(HashMap<String, LicenseInternal> aInLicenses) {
+    public HashMap<String, LicenseInternal> ProcessInfoInSalesForce(HashMap<String, LicenseInternal> aInLicenses, AtomicLong aInOutRetryInterval) {
+
+        // Initialize retry interval
+        aInOutRetryInterval.set(Configuration.GetRetryInterval());
 
         System.out.println("Reconciler: Ordering licenses");
         List<LicenseInternal> lOrderedLicences = GetOrderLicenses(aInLicenses);
@@ -104,20 +126,34 @@ public class Reconciler extends Thread {
 
         List<LicenseInternal> lCurrentBatch = new ArrayList<LicenseInternal>();
         int lCurrentBatchSize = 0;
+        int lCurrentApiCalls = 0;
         for(LicenseInternal lLicense : lOrderedLicences) {
+
+            if(lCurrentApiCalls >= SALES_FORCE_API_MAX_COUNT) {
+
+                System.out.println("Reconciler: Already called SFDC 5 times together, saving the licence " + lLicense.GetKey() + " for next retry");
+                // Don't make more than 5 calls in 30 mins
+                lFailedRequests.put(lLicense.GetKey(), lLicense);
+                aInOutRetryInterval.set(SALES_FORCE_API_RETRY_INTERVAL);
+                continue;
+            }
 
             lCurrentBatchSize++;
             lCurrentBatch.add(lLicense);
+            //System.out.println("Reconciler: Adding licence " + lLicense.GetKey() + " for posting to SFDC");
 
             if(lCurrentBatchSize >= SALES_FORCE_API_BATCH) {
                 // Post to Sales Force
                 PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true);
+                lCurrentApiCalls++;
                 lCurrentBatch = new ArrayList<LicenseInternal>();
                 lCurrentBatchSize = 0;
             }
         }
 
-        if(lCurrentBatch.size() > 0) {
+        if((lCurrentApiCalls < SALES_FORCE_API_MAX_COUNT)
+            && (lCurrentBatch.size() > 0)) {
+
             PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true);
         }
 

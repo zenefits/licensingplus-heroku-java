@@ -4,6 +4,7 @@ import Core.Nipr.LicenseInternal;
 import Core.Utils.CalenderUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.xml.bind.Unmarshaller;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -20,9 +21,40 @@ public class LicenseDB {
     private static HashMap<String, LicenseInternal> UnprocessedLicenses = new HashMap<String, LicenseInternal>();
     private static HashMap<String, GregorianCalendar> PendingNiprSyncDates = new HashMap<String, GregorianCalendar>();
     private static GregorianCalendar LastSuccessfullSync = null;
+    private static UUID ResyncTriggerId = UUID.randomUUID();
+    private static Thread ReconcilerThread = null;
 
     static  {
         PendingNiprSyncDates = CalenderUtils.GetLastNDays(Configuration.GetResyncDaysCount());
+    }
+
+    public static void SetReconcilerThread(Thread aInThread) {
+        ReconcilerThread = aInThread;
+    }
+
+    public static UUID GetResyncTriggerId() {
+
+        readLock.lock();
+        try {
+            return UUID.fromString(ResyncTriggerId.toString());
+        }
+        finally {
+            readLock.unlock();
+        }
+    }
+
+    public static void TriggerResync() {
+        System.out.println("LicenseDB: Triggering Resync ");
+        writeLock.lock();
+        try {
+            ResyncTriggerId = UUID.randomUUID();
+            System.out.println("LicenseDB: Triggered Resync ID " + ResyncTriggerId);
+        }
+        finally {
+            writeLock.unlock();
+        }
+
+        ReconcilerThread.interrupt();
     }
 
     public static HashMap<String, GregorianCalendar> GetPendingNiprSyncDates() {
@@ -63,6 +95,7 @@ public class LicenseDB {
         finally {
             writeLock.unlock();
         }
+        TriggerResync();
     }
 
     public static void RemoveNiprSyncDate(String aInDate) {
