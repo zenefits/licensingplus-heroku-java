@@ -58,4 +58,9 @@ public class WebUtils {
 
         return lResponse;
     }
+
+    public static void Appendline(String aInMsg, StringBuilder aInOutData) {
+        aInOutData.append(aInMsg);
+        aInOutData.append(System.getProperty("line.separator"));
+    }
 }

@@ -31,6 +31,9 @@ public class Reconciler extends Thread {
 
         System.out.println("Reconciler: Started the reconciler thread");
         SfClient = new SalesForceClient("https://test.salesforce.com/services/oauth2/token", Configuration.GetSalesForceAuthInfo());
+
+        SendGridClient.Init(Configuration.GetSendGridKey(), Configuration.GetAlertEmailRecipient(), Configuration.GetAlertEmailSender());
+       // String ltest = SendGridClient.GetSendGridEmailBody("foo", "bar");
         NiprClient lClient = NiprClientConfiguration.GetNiprClient(Configuration.GetNiprAuthToken());
         AtomicLong lRetryInterval = null;
         UUID lResyncTriggerId = LicenseDB.GetResyncTriggerId();
@@ -94,13 +97,14 @@ public class Reconciler extends Thread {
             HashMap<String, LicenseInternal> aInOutLicenses,
             HashMap<String, GregorianCalendar> aOutSuccessDates)
     {
+        StringBuilder lErrors = new StringBuilder();
         try {
 
             System.out.println("Reconciler: Attempting a Nipr Sync for " + aInDaysToSync.size() + " days");
             // Get all information
             AtomicBoolean lFailure = new AtomicBoolean(false);
             if(aInDaysToSync.size() > 0) {
-                aInClient.GetNiprReports(aInDaysToSync, aInOutLicenses, aOutSuccessDates);
+                aInClient.GetNiprReports(aInDaysToSync, aInOutLicenses, aOutSuccessDates, lErrors);
             }
 
             System.out.println("Reconciler: Current new licenses " + aInOutLicenses.size() + " Older unprocessed licenses " + aInExistingLicenses.size());
@@ -110,11 +114,20 @@ public class Reconciler extends Thread {
 
         }
         catch (Exception ex) {
-            System.out.println("Reconciler: Exception in calling NiprClient " + ex.getMessage());
+            String lMsg = "Reconciler: Exception in calling NiprClient " + ex.getMessage();
+            WebUtils.Appendline(lMsg, lErrors);
+            System.out.println(lMsg);
+        }
+
+        if(lErrors.length() > 0) {
+            // Send an email with the alert
+            SendGridClient.SendEmail("Nipr Sync Errors", lErrors.toString());
         }
     }
 
     public HashMap<String, LicenseInternal> ProcessInfoInSalesForce(HashMap<String, LicenseInternal> aInLicenses, AtomicLong aInOutRetryInterval) {
+
+        StringBuilder lErrors = new StringBuilder();
 
         // Initialize retry interval
         aInOutRetryInterval.set(Configuration.GetRetryInterval());
@@ -144,7 +157,7 @@ public class Reconciler extends Thread {
 
             if(lCurrentBatchSize >= SALES_FORCE_API_BATCH) {
                 // Post to Sales Force
-                PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true);
+                PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true, lErrors);
                 lCurrentApiCalls++;
                 lCurrentBatch = new ArrayList<LicenseInternal>();
                 lCurrentBatchSize = 0;
@@ -154,7 +167,12 @@ public class Reconciler extends Thread {
         if((lCurrentApiCalls < SALES_FORCE_API_MAX_COUNT)
             && (lCurrentBatch.size() > 0)) {
 
-            PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true);
+            PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true, lErrors);
+        }
+
+        if(lErrors.length() > 0) {
+            // Send an email with the alert
+            SendGridClient.SendEmail("Nipr Sync Errors", lErrors.toString());
         }
 
         return lFailedRequests;
@@ -164,8 +182,10 @@ public class Reconciler extends Thread {
             List<LicenseInternal> aInLicenses,
             HashMap<String, LicenseInternal> aInOutFailedRequests,
             HashMap<String, LicenseInternal> aInAllRequests,
-            boolean aInRetry) {
+            boolean aInRetry,
+            StringBuilder aInOutErrors) {
 
+        String lMsg = "";
         System.out.println("Reconciler: Call to Post to sales force, size " + aInLicenses.size() + " retry " + aInRetry);
         boolean lFailed = false;
         try {
@@ -179,7 +199,9 @@ public class Reconciler extends Thread {
                 }
                 else
                 {
-                    //System.out.println("Reconciler: License Key " + lKey + " failed to send " + lLicenseResponse.getErrorDescription());
+                    lMsg = "Reconciler: License Key " + lKey + " failed to send " + lLicenseResponse.getErrorDescription();
+                    WebUtils.Appendline(lMsg, aInOutErrors);
+                    //System.out.println(lMsg);
                     if(aInAllRequests.containsKey(lKey)) {
 
                         LicenseInternal lLicense = aInAllRequests.get(lKey);
@@ -188,17 +210,21 @@ public class Reconciler extends Thread {
                         aInOutFailedRequests.put(lKey, lLicense);
                     }
                     else {
-                        System.out.println("Reconciler: License Key " + lKey + " failed as per response but not found in request!! Ignoring ..");
+                        lMsg = "Reconciler: License Key " + lKey + " failed as per response but not found in request!! Ignoring ..";
+                        WebUtils.Appendline(lMsg, aInOutErrors);
+                        System.out.println(lMsg);
                     }
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Post to sales force failed due to exception " + ex);
+            lMsg = "Post to sales force failed due to exception " + ex;
+            WebUtils.Appendline(lMsg, aInOutErrors);
+            System.out.println(lMsg);
             // TODO: Check the failure
             if (aInRetry) {
 
                 System.out.println("Retyring call to sales force ");
-                PostToSalesForce(aInLicenses, aInOutFailedRequests, aInAllRequests, false);
+                PostToSalesForce(aInLicenses, aInOutFailedRequests, aInAllRequests, false, aInOutErrors);
             } else {
                 // Add all the requests to Failed ones
                 for (LicenseInternal lLicense : aInLicenses) {

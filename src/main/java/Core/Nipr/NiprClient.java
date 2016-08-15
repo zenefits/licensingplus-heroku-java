@@ -38,7 +38,8 @@ public class NiprClient extends WebServiceGatewaySupport {
     public void GetNiprReports(
             HashMap<String, GregorianCalendar> aInDates,
             HashMap<String, LicenseInternal> aInOutLatestLicenses,
-            HashMap<String, GregorianCalendar> aOutSuccessDates)
+            HashMap<String, GregorianCalendar> aOutSuccessDates,
+            StringBuilder aInOutErrors)
     {
 
         HashMap<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
@@ -49,7 +50,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             System.out.println("NiprClient: Get data for " + lFormattedDate);
 
             AtomicBoolean lSpecificFailure = new AtomicBoolean(false);
-            lCurrentDayInfo = GetSpecificReport(lCal, lSpecificFailure);
+            lCurrentDayInfo = GetSpecificReport(lCal, lSpecificFailure, aInOutErrors);
 
             if(lSpecificFailure.get()) {
                 System.out.println("Nipr Sync for date " + lFormattedDate + " failed");
@@ -85,7 +86,7 @@ public class NiprClient extends WebServiceGatewaySupport {
         }
     }
 
-    public HashMap<String, LicenseInternal> GetSpecificReport(GregorianCalendar aInDate, AtomicBoolean aOutFailure) {
+    public HashMap<String, LicenseInternal> GetSpecificReport(GregorianCalendar aInDate, AtomicBoolean aOutFailure, StringBuilder aInOutErrors) {
 
         HashMap<String, LicenseInternal> lAllLicenses = new HashMap<String, LicenseInternal>();
         aOutFailure.set(false);
@@ -132,14 +133,18 @@ public class NiprClient extends WebServiceGatewaySupport {
             }
             catch (Exception ex) {
                 aOutFailure.set(true);
-                System.out.println("NiprSoapApi SoapFaultClientException error in parsing the exception ");
+                String lMsg = "NiprSoapApi SoapFaultClientException error in parsing the exception " + ex.getMessage();
+                WebUtils.Appendline(lMsg, aInOutErrors);
+                System.out.println(lMsg);
             }
         }
         catch (Exception e)
         {
             aOutFailure.set(true);
             e.printStackTrace();
-            System.out.println("NiprSoapApi generic exception  " + e.getMessage());
+            String lMsg = "NiprSoapApi generic exception  " + e.getMessage();
+            WebUtils.Appendline(lMsg, aInOutErrors);
+            System.out.println(lMsg);
         }
 
         return lAllLicenses;

@@ -29,6 +29,15 @@ public class Configuration {
     private static final String salesForcePasswordField = "SALESFORCE_PASSWORD";
     private static String salesForcePassword;
 
+    private static final String sendGridApiKeyField = "SENDGRID_API_KEY";
+    private static String sendGridApiKey;
+
+    private static final String alertEmailRecipientField = "EMAIL_ALERT_RECIPIENT";
+    private static String alertEmailRecipient;
+
+    private static final String alertEmailSenderField = "EMAIL_ALERT_SENDER";
+    private static String alertEmailSender;
+
     private static final String reconcilerRetryField = "RETRY_INTERVAL";
     private static int reconcilerRetry;
 
@@ -65,6 +74,10 @@ public class Configuration {
 
         salesForcePassword = System.getenv(salesForcePasswordField);
         ThrowIfEmpty(salesForcePasswordField, salesForcePassword);
+
+        sendGridApiKey = System.getenv(sendGridApiKeyField);
+        alertEmailRecipient = System.getenv(alertEmailRecipientField);
+        alertEmailSender = System.getenv(alertEmailSenderField);
 
         String lInterval = System.getenv(reconcilerRetryField);
         if(CalenderUtils.isNullOrWhiteSpace(lInterval)) {
@@ -108,6 +121,18 @@ public class Configuration {
             System.out.println("Failed to url encode sales force auth info");
         }
         return lInfo;
+    }
+
+    public static String GetSendGridKey() {
+        return sendGridApiKey;
+    }
+
+    public static String GetAlertEmailRecipient() {
+        return alertEmailRecipient;
+    }
+
+    public static String GetAlertEmailSender() {
+        return alertEmailSender;
     }
 
     public static void ThrowIfEmpty(String aInDataField, String aInData) {
