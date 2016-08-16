@@ -6,12 +6,16 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.json.simple.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * Created by vthiruvengadam on 8/15/16.
  */
 public class SendGridClient {
 
     private final static String sendGridUrl = "https://api.sendgrid.com/v3/mail/send";
+    private final static String sendGridUrlv2 = "https://api.sendgrid.com/api/mail.send.json";
 
     private final static String sendEmailData =  "{" +
             "\"personalizations\": [{ \"to\": [{\"email\": \"<SEND_TO_EMAIL>\"}]}]," +
@@ -19,11 +23,17 @@ public class SendGridClient {
             "\"subject\": \"<EMAIL_SUBJECT>\"," +
             "\"content\": [<EMAIL_CONTENT>] }";
 
+    // api_user=your_sendgrid_username&api_key=your_sendgrid_password&to=destination@example.com&toname=Destination&subject=Example_Subject&text=testingtextbody&from=info@domain.com
+
     private static String apiToken;
 
     private static String alertEmailRecipient;
 
     private static String alertEmailSender;
+
+    private static String sendgridUsername;
+
+    private static String sendgridPassword;
 
     public static String getSendGridEmailBody(String aInSubject, String aInBody) {
         JSONObject obj = new JSONObject();
@@ -40,6 +50,13 @@ public class SendGridClient {
 
     public static void init(String aInToken, String aInEmailRecipient, String aInAlertEmailSender) {
         apiToken = aInToken;
+        alertEmailRecipient = aInEmailRecipient;
+        alertEmailSender = aInAlertEmailSender;
+    }
+
+    public static void initV2(String aInUsername, String aInPassword, String aInEmailRecipient, String aInAlertEmailSender) {
+        sendgridUsername = aInUsername;
+        sendgridPassword = aInPassword;
         alertEmailRecipient = aInEmailRecipient;
         alertEmailSender = aInAlertEmailSender;
     }
@@ -79,5 +96,37 @@ public class SendGridClient {
         System.out.println("SendGridClient: Email sent successfully");
     }
 
+    public static void sendEmailv2 (String aInSubject, String aInBody) {
+
+        if(CalenderUtils.isNullOrWhiteSpace(sendgridUsername)
+           || CalenderUtils.isNullOrWhiteSpace(sendgridPassword)) {
+            System.out.println("SendGridClientV2: No username password set, skipping....");
+        }
+
+        try {
+            String lData = "api_user=" + sendgridUsername +
+                    "&api_key=" + sendgridPassword +
+                    "&to=" + alertEmailRecipient +
+                    "&subject=" + URLEncoder.encode(aInSubject, "UTF-8") +
+                    "&text=" + URLEncoder.encode(aInBody, "UTF-8") +
+                    "&from=" + alertEmailSender;
+            HttpHeaders lHeaders = new HttpHeaders();
+            lHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            ResponseEntity<String> lResponse = WebUtils.postData(sendGridUrlv2, lData, lHeaders, String.class);
+            if ((lResponse.getStatusCode() == HttpStatus.OK)
+                    || (lResponse.getStatusCode() == HttpStatus.ACCEPTED))
+            {
+                System.out.println("SendGridClientV2: Email sent ");
+
+            } else {
+                System.out.println("SendGridClientV2: Failed to Send Email:  " + lResponse.getStatusCode());
+            }
+
+        }
+        catch (Exception ex) {
+            System.out.println("SendGridClientV2: Failed to send Email " + ex.getMessage());
+        }
+    }
 
 }

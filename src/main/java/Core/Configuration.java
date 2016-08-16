@@ -28,8 +28,17 @@ public class Configuration {
     private static final String salesForcePasswordField = "SALESFORCE_PASSWORD";
     private static String salesForcePassword;
 
+    private static final String salesForceAuthUrlField = "SALESFORCE_AUTH_URL";
+    private static String salesForceAuthUrl;
+
     private static final String sendGridApiKeyField = "SENDGRID_API_KEY";
     private static String sendGridApiKey;
+
+    private static final String sendGridUsernameField = "SENDGRID_USERNAME";
+    private static String sendGridUsername;
+
+    private static final String sendGridPasswordField = "SENDGRID_PASSWORD";
+    private static String sendGridPassword;
 
     private static final String alertEmailRecipientField = "EMAIL_ALERT_RECIPIENT";
     private static String alertEmailRecipient;
@@ -74,7 +83,13 @@ public class Configuration {
         salesForcePassword = System.getenv(salesForcePasswordField);
         throwIfEmpty(salesForcePasswordField, salesForcePassword);
 
+        // https://test.salesforce.com/services/oauth2/token
+        salesForceAuthUrl = System.getenv(salesForceAuthUrlField);
+        throwIfEmpty(salesForceAuthUrlField, salesForceAuthUrl);
+
         sendGridApiKey = System.getenv(sendGridApiKeyField);
+        sendGridUsername = System.getenv(sendGridUsernameField);
+        sendGridPassword = System.getenv(sendGridPasswordField);
 
         alertEmailRecipient = System.getenv(alertEmailRecipientField);
         throwIfEmpty(alertEmailRecipientField, alertEmailRecipient);
@@ -118,6 +133,10 @@ public class Configuration {
         return niprPassword;
     }
 
+    public static String getSalesForceAuthUrl() {
+        return salesForceAuthUrl;
+    }
+
     public static String getSalesForceConsumerKey() {
         return salesForceConsumerKey;
     }
@@ -136,6 +155,14 @@ public class Configuration {
 
     public static String getSendGridApiKey() {
         return sendGridApiKey;
+    }
+
+    public static String getSendGridUsername() {
+        return sendGridUsername;
+    }
+
+    public static String getSendGridPassword() {
+        return sendGridPassword;
     }
 
     public static String getAlertEmailSender() {

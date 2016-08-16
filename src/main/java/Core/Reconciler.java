@@ -31,13 +31,18 @@ public class Reconciler extends Thread {
 
         System.out.println("Reconciler: Started the reconciler thread");
         SfClient = new SalesForceClient(
-                        "https://test.salesforce.com/services/oauth2/token",
+                        Configuration.getSalesForceAuthUrl(),
                         Configuration.getSalesForceConsumerKey(),
                         Configuration.getSalesForceConsumerSecret(),
                         Configuration.getSalesForceUsername(),
                         Configuration.getSalesForcePassword());
 
-        SendGridClient.init(Configuration.getSendGridKey(), Configuration.getAlertEmailRecipient(), Configuration.getAlertEmailSender());
+        SendGridClient.initV2(
+                Configuration.getSendGridUsername(),
+                Configuration.getSendGridPassword(),
+                Configuration.getAlertEmailRecipient(),
+                Configuration.getAlertEmailSender());
+
         NiprClient lClient =
                 NiprClientConfiguration.getNiprClient(
                         Configuration.getGetNiprAlertEndpoint(),
@@ -131,7 +136,7 @@ public class Reconciler extends Thread {
         if(lErrors.length() > 0) {
             // Send an email with the alert
             int lErrorDays = aInDaysToSync.values().size() - aOutSuccessDates.values().size();
-            SendGridClient.sendEmail("Nipr Sync Errors", "Nipr Sync has Errors for " + lErrorDays + " days, check the UI for details");
+            SendGridClient.sendEmailv2("Nipr Sync Errors", "Nipr Sync has Errors for " + lErrorDays + " days, check the UI for details");
         }
     }
 
@@ -182,8 +187,7 @@ public class Reconciler extends Thread {
 
         if(lFailedRequests.size() > 0) {
             // Send an email with the alert
-
-            SendGridClient.sendEmail("License Sync Errors", "Failed to update " + lFailedRequests.size() + " licenses in sales force, check UI for details");
+            SendGridClient.sendEmailv2("License Sync Errors", "Failed to update " + lFailedRequests.size() + " licenses in sales force, check UI for details");
         }
 
         return lFailedRequests;
