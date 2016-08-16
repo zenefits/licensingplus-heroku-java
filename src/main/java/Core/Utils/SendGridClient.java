@@ -62,7 +62,9 @@ public class SendGridClient {
             lHeaders.set("Authorization", "Bearer " + apiToken);
             // send request and parse result
             ResponseEntity<String> lResponse = WebUtils.PostData(sendGridUrl, lData, lHeaders, String.class);
-            if (lResponse.getStatusCode() == HttpStatus.OK) {
+            if ((lResponse.getStatusCode() == HttpStatus.OK)
+                || (lResponse.getStatusCode() == HttpStatus.ACCEPTED))
+            {
                 System.out.println("SendGridClient: Email sent ");
 
             } else {

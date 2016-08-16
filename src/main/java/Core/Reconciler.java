@@ -33,7 +33,6 @@ public class Reconciler extends Thread {
         SfClient = new SalesForceClient("https://test.salesforce.com/services/oauth2/token", Configuration.GetSalesForceAuthInfo());
 
         SendGridClient.Init(Configuration.GetSendGridKey(), Configuration.GetAlertEmailRecipient(), Configuration.GetAlertEmailSender());
-       // String ltest = SendGridClient.GetSendGridEmailBody("foo", "bar");
         NiprClient lClient = NiprClientConfiguration.GetNiprClient(Configuration.GetNiprAuthToken());
         AtomicLong lRetryInterval = null;
         UUID lResyncTriggerId = LicenseDB.GetResyncTriggerId();
@@ -121,7 +120,8 @@ public class Reconciler extends Thread {
 
         if(lErrors.length() > 0) {
             // Send an email with the alert
-            SendGridClient.SendEmail("Nipr Sync Errors", lErrors.toString());
+            int lErrorDays = aInDaysToSync.values().size() - aOutSuccessDates.values().size();
+            SendGridClient.SendEmail("Nipr Sync Errors", "Nipr Sync has Errors for " + lErrorDays + " days, check the UI for details");
         }
     }
 
@@ -170,9 +170,10 @@ public class Reconciler extends Thread {
             PostToSalesForce(lCurrentBatch, lFailedRequests, aInLicenses, true, lErrors);
         }
 
-        if(lErrors.length() > 0) {
+        if(lFailedRequests.size() > 0) {
             // Send an email with the alert
-            SendGridClient.SendEmail("Nipr Sync Errors", lErrors.toString());
+
+            SendGridClient.SendEmail("License Sync Errors", "Failed to update " + lFailedRequests.size() + " licenses in sales force, check UI for details");
         }
 
         return lFailedRequests;
