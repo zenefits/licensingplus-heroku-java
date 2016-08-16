@@ -10,6 +10,7 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+//can you resolve all warnings?
 public class NiprClientConfiguration {
 
     private static String niprAuthToken;
@@ -29,6 +30,7 @@ public class NiprClientConfiguration {
         Jaxb2Marshaller lMarshaller = NiprClientConfiguration.GetMarshaller();
 
         NiprClient client = new NiprClient();
+        //Can you move the endpoint to a system config called NIPR_ALERT_ENDPOINT?
         client.setDefaultUri("https://pdb-services.nipr.com/pdb-alerts-industry-services/services/industry-ws");
         client.setMarshaller(lMarshaller);
         client.setUnmarshaller(lMarshaller);

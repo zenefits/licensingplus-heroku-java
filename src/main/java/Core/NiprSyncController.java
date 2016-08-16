@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
+//can you make all uri lower case in first letter?
 @RestController
 public class NiprSyncController {
 

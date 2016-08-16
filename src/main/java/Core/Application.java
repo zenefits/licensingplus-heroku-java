@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
+//please remove all unused classes
+// will you be able to provide any documentation and some simple flows?
+// Maybe provide a README.md?
 public class Application {
 
     public static void main(String[] args) {

@@ -12,8 +12,11 @@ import java.util.List;
 /**
  * Created by vthiruvengadam on 8/9/16.
  */
+// Do we really need this class? Since spring already provide methods for restTemplate, can you just move the calls into 
+// SalesforceRestClient and SalesforceOAuth?
 public class WebUtils {
-
+    
+	//PLEASE do NOT catch exception here, try move to SalesforceRestClient and SalesforceOAuth
     public static <T> T GetObjectFromJson(String aInData, Class<T> aInClass) {
         T lResponse = null;
         try {
@@ -26,7 +29,9 @@ public class WebUtils {
 
         return lResponse;
     }
-
+    
+    
+    //PLEASE do NOT catch exception here, try move to SalesforceRestClient and SalesforceOAuth
     public static List<LicenseResponse> GetResponseFromJson(String aInData) {
         List<LicenseResponse> lResponse = null;
         try {
@@ -39,7 +44,8 @@ public class WebUtils {
 
         return lResponse;
     }
-
+    
+    //PLEASE do NOT catch exception here, try move to SalesforceRestClient and SalesforceOAuth
     public static <T> ResponseEntity<T>  PostData(String aInUrl, String aInData, HttpHeaders aInHeaders, Class<T> aInType) {
 
         System.out.println("WebUtils: Posting data to " + aInUrl);
@@ -49,7 +55,8 @@ public class WebUtils {
 
         ResponseEntity<T> lResponse = lRestTemplate
                 .exchange(aInUrl, HttpMethod.POST, entity, aInType);
-
+        
+        // you probably want to throw exception here instead of print things out
         if (lResponse.getStatusCode() == HttpStatus.OK) {
             System.out.println("WebUtils: Post was a success");
         } else if (lResponse.getStatusCode() == HttpStatus.UNAUTHORIZED) {

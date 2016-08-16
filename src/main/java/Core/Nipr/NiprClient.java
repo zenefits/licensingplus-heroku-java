@@ -3,6 +3,11 @@ package Core.Nipr;
 /**
  * Created by vthiruvengadam on 8/5/16.
  */
+
+// Please name all method, variables first letter lower case
+// If I want to sync other information (a different wsdl's information), 
+// for current error handling way, do I need to create another NIPRClient class and copy all the methods? If so, I will name this class NIPRAlertClient
+// do you actually verify all the failed response and check if it is valid failure and test the old data not override new data?
 import nipr.*;
 import nipr.wsdl.*;
 import Core.Utils.*;
@@ -28,7 +33,8 @@ import org.springframework.ws.soap.client.core.SoapActionCallback;
 public class NiprClient extends WebServiceGatewaySupport {
 
     private GregorianCalendar LastSuccessfulSyncDate;
-
+    
+    //Please use Set here
     private HashSet<String> SyncedDates;
 
     public NiprClient() {
@@ -41,7 +47,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             HashMap<String, GregorianCalendar> aOutSuccessDates,
             StringBuilder aInOutErrors)
     {
-
+        //Please use Map here
         HashMap<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
 
         for(GregorianCalendar lCal : aInDates.values()) {
@@ -85,7 +91,8 @@ public class NiprClient extends WebServiceGatewaySupport {
             }
         }
     }
-
+    
+    //can you add a retry if the first request timeout or do you think we need it?
     public HashMap<String, LicenseInternal> GetSpecificReport(GregorianCalendar aInDate, AtomicBoolean aOutFailure, StringBuilder aInOutErrors) {
 
         HashMap<String, LicenseInternal> lAllLicenses = new HashMap<String, LicenseInternal>();
@@ -102,7 +109,8 @@ public class NiprClient extends WebServiceGatewaySupport {
         try {
             XMLGregorianCalendar lXmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(aInDate);
             lRequest.setReportDate(lXmlDate);
-
+            
+            //Can you just append the receiveSpecificReport to NIPR_ALERT_ENDPOINT?
             Object lSoapResponse = getWebServiceTemplate()
                     .marshalSendAndReceive(
                             lRequest,
