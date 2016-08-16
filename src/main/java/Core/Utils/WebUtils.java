@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class WebUtils {
 
-    public static <T> T GetObjectFromJson(String aInData, Class<T> aInClass) {
+    public static <T> T getObjectFromJson(String aInData, Class<T> aInClass) {
         T lResponse = null;
         try {
             ObjectMapper lMapper = new ObjectMapper();
@@ -27,7 +27,7 @@ public class WebUtils {
         return lResponse;
     }
 
-    public static List<LicenseResponse> GetResponseFromJson(String aInData) {
+    public static List<LicenseResponse> getResponseFromJson(String aInData) {
         List<LicenseResponse> lResponse = null;
         try {
             ObjectMapper lMapper = new ObjectMapper();
@@ -40,7 +40,7 @@ public class WebUtils {
         return lResponse;
     }
 
-    public static <T> ResponseEntity<T>  PostData(String aInUrl, String aInData, HttpHeaders aInHeaders, Class<T> aInType) {
+    public static <T> ResponseEntity<T>  postData(String aInUrl, String aInData, HttpHeaders aInHeaders, Class<T> aInType) {
 
         System.out.println("WebUtils: Posting data to " + aInUrl);
         String lResponseData = "";
@@ -59,7 +59,7 @@ public class WebUtils {
         return lResponse;
     }
 
-    public static void Appendline(String aInMsg, StringBuilder aInOutData) {
+    public static void appendline(String aInMsg, StringBuilder aInOutData) {
         aInOutData.append(aInMsg);
         aInOutData.append(System.getProperty("line.separator"));
     }

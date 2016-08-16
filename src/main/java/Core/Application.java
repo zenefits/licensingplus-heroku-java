@@ -1,8 +1,5 @@
 package Core;
 
-import java.util.Arrays;
-
-import Core.SalesForce.SalesForceClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +17,7 @@ public class Application {
         System.out.println("Launching the reconciler thread");
 
         Reconciler lReconciler = new Reconciler();
-        LicenseDB.SetReconcilerThread(lReconciler);
+        LicenseDB.setReconcilerThread(lReconciler);
         lReconciler.start();
     }
 

@@ -25,7 +25,7 @@ public class SendGridClient {
 
     private static String alertEmailSender;
 
-    public static String GetSendGridEmailBody(String aInSubject, String aInBody) {
+    public static String getSendGridEmailBody(String aInSubject, String aInBody) {
         JSONObject obj = new JSONObject();
         obj.put("value", aInBody);
         obj.put("type", "text/plain");
@@ -38,20 +38,20 @@ public class SendGridClient {
         return lSendEmailData;
     }
 
-    public static void Init(String aInToken, String aInEmailRecipient, String aInAlertEmailSender) {
+    public static void init(String aInToken, String aInEmailRecipient, String aInAlertEmailSender) {
         apiToken = aInToken;
         alertEmailRecipient = aInEmailRecipient;
         alertEmailSender = aInAlertEmailSender;
     }
 
-    public static void SendEmail(String aInSubject, String aInBody) {
+    public static void sendEmail(String aInSubject, String aInBody) {
 
         if(CalenderUtils.isNullOrWhiteSpace(apiToken)) {
             System.out.println("SendGridClient: No api key is set, skipping....");
         }
 
 
-        String lData = GetSendGridEmailBody(aInSubject, aInBody);
+        String lData = getSendGridEmailBody(aInSubject, aInBody);
         System.out.println("SendGridClient: Sending email " + lData);
 
         try
@@ -61,7 +61,7 @@ public class SendGridClient {
 
             lHeaders.set("Authorization", "Bearer " + apiToken);
             // send request and parse result
-            ResponseEntity<String> lResponse = WebUtils.PostData(sendGridUrl, lData, lHeaders, String.class);
+            ResponseEntity<String> lResponse = WebUtils.postData(sendGridUrl, lData, lHeaders, String.class);
             if ((lResponse.getStatusCode() == HttpStatus.OK)
                 || (lResponse.getStatusCode() == HttpStatus.ACCEPTED))
             {

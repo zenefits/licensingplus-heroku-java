@@ -3,10 +3,7 @@ package Core;
 import Core.Nipr.LicenseInternal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class NiprSyncController {
@@ -17,30 +14,30 @@ public class NiprSyncController {
         return "Welcome to LicensePlus Nipr Sync Portal";
     }
 
-    @RequestMapping("/GetFailedLicenses")
-    public List<LicenseInternal> GetFailedLicenses(@RequestParam(value="date", defaultValue="") String date) {
+    @RequestMapping("/getFailedLicenses")
+    public List<LicenseInternal> getFailedLicenses(@RequestParam(value="date", defaultValue="") String date) {
 
-        return LicenseDB.GetFailedLicensesByDate(date);
+        return LicenseDB.getFailedLicensesByDate(date);
     }
 
-    @RequestMapping("/GetPendingNiprSyncDates")
-    public List<String> GetPendingNiprSyncDates() {
-        HashMap<String, GregorianCalendar> lNiprSyncDates = LicenseDB.GetPendingNiprSyncDates();
+    @RequestMapping("/getPendingNiprSyncDates")
+    public List<String> getPendingNiprSyncDates() {
+        Map<String, GregorianCalendar> lNiprSyncDates = LicenseDB.getPendingNiprSyncDates();
         return new ArrayList<String>(lNiprSyncDates.keySet());
     }
 
-    @RequestMapping(value = "/AddNiprSyncDate/{date}", method = RequestMethod.POST)
-    public void AddNiprSyncDate(@PathVariable String date) {
-        LicenseDB.AddNiprSyncDate(date);
+    @RequestMapping(value = "/addNiprSyncDate/{date}", method = RequestMethod.POST)
+    public void addNiprSyncDate(@PathVariable String date) {
+        LicenseDB.addNiprSyncDate(date);
     }
 
-    @RequestMapping(value = "/RemoveNiprSyncDate/{date}", method = RequestMethod.POST)
-    public void RemoveNiprSyncDate(@PathVariable String date) {
-        LicenseDB.AddNiprSyncDate(date);
+    @RequestMapping(value = "/removeNiprSyncDate/{date}", method = RequestMethod.POST)
+    public void removeNiprSyncDate(@PathVariable String date) {
+        LicenseDB.removeNiprSyncDate(date);
     }
 
-    @RequestMapping(value = "/TriggerResync", method = RequestMethod.POST)
-    public void TriggerResync() {
-        LicenseDB.TriggerResync();
+    @RequestMapping(value = "/triggerResync", method = RequestMethod.POST)
+    public void triggerResync() {
+        LicenseDB.triggerResync();
     }
 }

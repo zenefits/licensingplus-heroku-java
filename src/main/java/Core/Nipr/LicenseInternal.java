@@ -67,7 +67,7 @@ public class LicenseInternal {
     }
 
     public String GetKey() {
-        return npnNumber + ";" + licenseNumber + ";" + CalenderUtils.GetSdfcStateName(state) + ";" + CalenderUtils.GetSFDCResponseDateFormat(effectiveDate);
+        return npnNumber + ";" + licenseNumber + ";" + CalenderUtils.getSdfcStateName(state) + ";" + CalenderUtils.getSFDCResponseDateFormat(effectiveDate);
     }
 
     @Override

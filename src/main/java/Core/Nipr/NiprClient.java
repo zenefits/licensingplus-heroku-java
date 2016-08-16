@@ -27,30 +27,22 @@ import org.springframework.ws.soap.client.core.SoapActionCallback;
 
 public class NiprClient extends WebServiceGatewaySupport {
 
-    private GregorianCalendar LastSuccessfulSyncDate;
-
-    private HashSet<String> SyncedDates;
-
-    public NiprClient() {
-        SyncedDates = new HashSet<String>();
-    }
-
-    public void GetNiprReports(
-            HashMap<String, GregorianCalendar> aInDates,
-            HashMap<String, LicenseInternal> aInOutLatestLicenses,
-            HashMap<String, GregorianCalendar> aOutSuccessDates,
+    public void getNiprReports(
+            Map<String, GregorianCalendar> aInDates,
+            Map<String, LicenseInternal> aInOutLatestLicenses,
+            Map<String, GregorianCalendar> aOutSuccessDates,
             StringBuilder aInOutErrors)
     {
 
-        HashMap<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
+        Map<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
 
         for(GregorianCalendar lCal : aInDates.values()) {
 
-            String lFormattedDate = CalenderUtils.GetFormattedDate(lCal);
+            String lFormattedDate = CalenderUtils.getFormattedDate(lCal);
             System.out.println("NiprClient: Get data for " + lFormattedDate);
 
             AtomicBoolean lSpecificFailure = new AtomicBoolean(false);
-            lCurrentDayInfo = GetSpecificReport(lCal, lSpecificFailure, aInOutErrors);
+            lCurrentDayInfo = getSpecificReport(lCal, lSpecificFailure, aInOutErrors);
 
             if(lSpecificFailure.get()) {
                 System.out.println("Nipr Sync for date " + lFormattedDate + " failed");
@@ -60,14 +52,14 @@ public class NiprClient extends WebServiceGatewaySupport {
             System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS");
 
             // Previous Day is higher
-            MergeReports(lCurrentDayInfo, aInOutLatestLicenses);
+            mergeReports(lCurrentDayInfo, aInOutLatestLicenses);
             GregorianCalendar lCalCopy = (GregorianCalendar)lCal.clone();
-            aOutSuccessDates.put(CalenderUtils.GetFormattedDate(lCalCopy), lCalCopy);
+            aOutSuccessDates.put(CalenderUtils.getFormattedDate(lCalCopy), lCalCopy);
         }
     }
 
 
-    public void MergeReports(HashMap<String, LicenseInternal> aInDateInfo1, HashMap<String, LicenseInternal> aInDateInfo2) {
+    public void mergeReports(Map<String, LicenseInternal> aInDateInfo1, Map<String, LicenseInternal> aInDateInfo2) {
 
         for (LicenseInternal lLicense : aInDateInfo1.values()) {
             if(!aInDateInfo2.containsKey(lLicense.GetKey())) {
@@ -75,9 +67,9 @@ public class NiprClient extends WebServiceGatewaySupport {
             }
             else {
                 String lDate1Str = lLicense.niprUpdateDate;
-                GregorianCalendar lDate1 = CalenderUtils.GetCalenderTimeFromString(lDate1Str);
+                GregorianCalendar lDate1 = CalenderUtils.getCalenderTimeFromString(lDate1Str);
                 String lDate2Str = aInDateInfo2.get(lLicense.GetKey()).niprUpdateDate;
-                GregorianCalendar lDate2 = CalenderUtils.GetCalenderTimeFromString(lDate2Str);
+                GregorianCalendar lDate2 = CalenderUtils.getCalenderTimeFromString(lDate2Str);
 
                 if(lDate2.compareTo(lDate1) < 0) {
                     aInDateInfo2.put(lLicense.GetKey(), lLicense);
@@ -86,9 +78,9 @@ public class NiprClient extends WebServiceGatewaySupport {
         }
     }
 
-    public HashMap<String, LicenseInternal> GetSpecificReport(GregorianCalendar aInDate, AtomicBoolean aOutFailure, StringBuilder aInOutErrors) {
+    public Map<String, LicenseInternal> getSpecificReport(GregorianCalendar aInDate, AtomicBoolean aOutFailure, StringBuilder aInOutErrors) {
 
-        HashMap<String, LicenseInternal> lAllLicenses = new HashMap<String, LicenseInternal>();
+        Map<String, LicenseInternal> lAllLicenses = new HashMap<String, LicenseInternal>();
         aOutFailure.set(false);
         ReceiveSpecificReport lRequest = new ReceiveSpecificReport();
         /*
@@ -96,7 +88,7 @@ public class NiprClient extends WebServiceGatewaySupport {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(lDate);
         */
-        String formatted = CalenderUtils.GetFormattedDate(aInDate);
+        String formatted = CalenderUtils.getFormattedDate(aInDate);
         System.out.println("Getting Record for ====================== " + formatted);
 
         try {
@@ -106,7 +98,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             Object lSoapResponse = getWebServiceTemplate()
                     .marshalSendAndReceive(
                             lRequest,
-                            new SoapActionCallback("https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveSpecificReport"));
+                            new SoapActionCallback(getDefaultUri() + "/receiveSpecificReport"));
 
             System.out.println("NIPR soap api SUCCESS ++++++++++++ " + formatted);
 
@@ -115,14 +107,14 @@ public class NiprClient extends WebServiceGatewaySupport {
             DataHandler lHandler = lType.getAlertsReport();
             //String theString = IOUtils.toString(lHandler.getInputStream(), "utf-8");
             //System.out.println("Response " + theString);
-            lAllLicenses = ParseReport(lType.getAlertsReport().getInputStream(), lXmlDate);
+            lAllLicenses = parseReport(lType.getAlertsReport().getInputStream(), lXmlDate);
             System.out.println("Total NIPR Liceses for " + formatted + " are " + lAllLicenses.size());
         }
         catch (SoapFaultClientException e)
         {
             aOutFailure.set(true);
             try {
-                PdbAlertsFaultType lFaultType = GetDetailedFault(e);
+                PdbAlertsFaultType lFaultType = getDetailedFault(e);
                 if(lFaultType != null) {
                     System.out.println("NiprSoapApi error from server " + lFaultType.getMessage());
                     if(lFaultType.getErrorCode() == 5) {
@@ -134,7 +126,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             catch (Exception ex) {
                 aOutFailure.set(true);
                 String lMsg = "NiprSoapApi SoapFaultClientException error in parsing the exception " + ex.getMessage();
-                WebUtils.Appendline(lMsg, aInOutErrors);
+                WebUtils.appendline(lMsg, aInOutErrors);
                 System.out.println(lMsg);
             }
         }
@@ -143,14 +135,14 @@ public class NiprClient extends WebServiceGatewaySupport {
             aOutFailure.set(true);
             e.printStackTrace();
             String lMsg = "NiprSoapApi generic exception  " + e.getMessage();
-            WebUtils.Appendline(lMsg, aInOutErrors);
+            WebUtils.appendline(lMsg, aInOutErrors);
             System.out.println(lMsg);
         }
 
         return lAllLicenses;
     }
 
-    private PdbAlertsFaultType GetDetailedFault(SoapFaultClientException aInException) throws IOException {
+    private PdbAlertsFaultType getDetailedFault(SoapFaultClientException aInException) throws IOException {
         SoapFaultDetail soapFaultDetail = aInException.getSoapFault().getFaultDetail();
         // if there is no fault detail ...
         if (soapFaultDetail == null) {
@@ -199,11 +191,11 @@ public class NiprClient extends WebServiceGatewaySupport {
 								QualifyingInsuranceLicenseIndicator - true
 								TypeCode - Adjuster
     */
-    private HashMap<String, LicenseInternal> ParseReport(InputStream aInData, XMLGregorianCalendar aInCalDate) {
+    private Map<String, LicenseInternal> parseReport(InputStream aInData, XMLGregorianCalendar aInCalDate) {
 
-        HashMap<String, LicenseInternal> lAllLicenses = new HashMap<String, LicenseInternal>();
+        Map<String, LicenseInternal> lAllLicenses = new HashMap<String, LicenseInternal>();
 
-        HashMap<String, Integer> lPersonNumberByKey = new HashMap<String, Integer>();
+        Map<String, Integer> lPersonNumberByKey = new HashMap<String, Integer>();
         try {
 
             JAXBContext jaxbContext = JAXBContext.newInstance(LicensingReportProcessResult.class);
@@ -215,7 +207,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                 LicensingReportProcessResult.LicensingReport lReport = lResult.getLicensingReport();
                 if(lReport != null) {
 
-                    lPersonNumberByKey = GetPersonNumbersByKey(lReport);
+                    lPersonNumberByKey = getPersonNumbersByKey(lReport);
 
                     List<LicensingReportProcessResult.LicensingReport.JurisdictionReport> lElements = lReport.getJurisdictionReport();
                     for (LicensingReportProcessResult.LicensingReport.JurisdictionReport lJdReport : lElements) {
@@ -226,7 +218,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                         String lPersonRef = lPReferences.getPersonReference();
                         // Process as Many as we can
                         try {
-                            ProcessJuriductionReport(lPersonNumberByKey, lJdReport, aInCalDate, lAllLicenses);
+                            processJuriductionReport(lPersonNumberByKey, lJdReport, aInCalDate, lAllLicenses);
                         }
                         catch(Exception e) {
                             System.out.println("Exception Processing JDReport Person: " + lPersonRef + " Exception: " + e.getMessage());
@@ -244,7 +236,7 @@ public class NiprClient extends WebServiceGatewaySupport {
         return lAllLicenses;
     }
 
-    private void ProcessJuriductionReport(HashMap<String, Integer> aInPersonNumberByKey, LicensingReportProcessResult.LicensingReport.JurisdictionReport lJdReport, XMLGregorianCalendar aInCalDate, HashMap<String, LicenseInternal> aInOutAllLicenses) {
+    private void processJuriductionReport(Map<String, Integer> aInPersonNumberByKey, LicensingReportProcessResult.LicensingReport.JurisdictionReport lJdReport, XMLGregorianCalendar aInCalDate, Map<String, LicenseInternal> aInOutAllLicenses) {
 
         LicensingReportProcessResult.LicensingReport.JurisdictionReport.PersonReferences lPReferences = lJdReport.getPersonReferences();
         String lPersonRef = lPReferences.getPersonReference();
@@ -281,7 +273,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                 LicenseInternal lLicenseInt = new LicenseInternal();
                 lLicenseInt.licenseNumber = Integer.toString(lLicense.getLicenseNumberId());
                 XMLGregorianCalendar lCal = lLicense.getIssueDate();
-                lLicenseInt.effectiveDate = CalenderUtils.ToSFDCDateFormat(lCal);
+                lLicenseInt.effectiveDate = CalenderUtils.toSFDCDateFormat(lCal);
                 LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.License.LicensePeriod lPeriod = lLicense.getLicensePeriod();
                 if(lPeriod != null) {
                     List<Serializable> lContents = lPeriod.getContent();
@@ -290,7 +282,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                             JAXBElement lElem = (JAXBElement)lContent;
                             if(lElem.getValue() instanceof XMLGregorianCalendar) {
                                 lCal = (XMLGregorianCalendar)lElem.getValue();
-                                lLicenseInt.expirationDate = CalenderUtils.ToSFDCDateFormat(lCal);
+                                lLicenseInt.expirationDate = CalenderUtils.toSFDCDateFormat(lCal);
                             }
 
                         }
@@ -322,7 +314,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                 else {
                     lLicenseInt.isActive = oneActiveLoa;
                 }
-                lLicenseInt.niprUpdateDate = CalenderUtils.ToSFDCDateFormat(aInCalDate);
+                lLicenseInt.niprUpdateDate = CalenderUtils.toSFDCDateFormat(aInCalDate);
                 if(!aInOutAllLicenses.containsKey(lLicenseInt.GetKey())) {
                     aInOutAllLicenses.put(lLicenseInt.GetKey(), lLicenseInt);
                 }
@@ -330,8 +322,8 @@ public class NiprClient extends WebServiceGatewaySupport {
         }
     }
 
-    private HashMap<String, Integer> GetPersonNumbersByKey(LicensingReportProcessResult.LicensingReport aInReport) {
-        HashMap<String, Integer> lPersonNumberByKey = new HashMap<String, Integer>();
+    private Map<String, Integer> getPersonNumbersByKey(LicensingReportProcessResult.LicensingReport aInReport) {
+        Map<String, Integer> lPersonNumberByKey = new HashMap<String, Integer>();
         List<LicensingReportProcessResult.LicensingReport.Person> lElements = aInReport.getPerson();
         for (LicensingReportProcessResult.LicensingReport.Person lPerson : lElements) {
             LicensingReportProcessResult.LicensingReport.Person.ExternalIdentifier lId = lPerson.getExternalIdentifier();

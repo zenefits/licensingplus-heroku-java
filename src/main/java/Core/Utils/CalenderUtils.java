@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class CalenderUtils {
 
-    public static final HashMap<String, String> STATE_MAP;
+    public static final Map<String, String> STATE_MAP;
     static {
         STATE_MAP = new HashMap<String, String>();
         STATE_MAP.put("AL", "Alabama");
@@ -85,7 +85,7 @@ public class CalenderUtils {
         STATE_MAP.put("YT", "Yukon Territory");
     }
 
-    public static boolean IsCalenderDaySame(GregorianCalendar aInCal1, GregorianCalendar aInCal2) {
+    public static boolean isCalenderDaySame(GregorianCalendar aInCal1, GregorianCalendar aInCal2) {
         if((aInCal1 == null)
                 && (aInCal2 != null)) {
             return false;
@@ -127,7 +127,7 @@ public class CalenderUtils {
         return false;
     }
 
-    public static String ToSFDCDateFormat(XMLGregorianCalendar aInCal) {
+    public static String toSFDCDateFormat(XMLGregorianCalendar aInCal) {
         if(aInCal == null) {
             return "";
         }
@@ -138,13 +138,13 @@ public class CalenderUtils {
         return a == null || (a.length() <= 0) || (a.length() > 0 && a.trim().length() <= 0);
     }
 
-    public static String GetFormattedDate(GregorianCalendar aInCal) {
+    public static String getFormattedDate(GregorianCalendar aInCal) {
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
         String formatted = format1.format(aInCal.getTime());
         return formatted;
     }
 
-    public static GregorianCalendar GetCalenderTimeFromString(String aInData) {
+    public static GregorianCalendar getCalenderTimeFromString(String aInData) {
         DateTimeFormatter formatter =
                 DateTimeFormat.forPattern("yyyy-MM-dd").withOffsetParsed();
         DateTime dateTime = formatter.parseDateTime(aInData);
@@ -152,13 +152,13 @@ public class CalenderUtils {
         return lCal;
     }
 
-    public static String GetSFDCResponseDateFormat(String aInSFDCDate) {
-        GregorianCalendar lCal = GetCalenderTimeFromString(aInSFDCDate);
+    public static String getSFDCResponseDateFormat(String aInSFDCDate) {
+        GregorianCalendar lCal = getCalenderTimeFromString(aInSFDCDate);
         int lMonth = lCal.get(Calendar.MONTH) + 1;
         return lMonth + "/" + lCal.get(Calendar.DAY_OF_MONTH) + "/" + lCal.get(Calendar.YEAR);
     }
 
-    public static String GetSdfcStateName(String aInCode) {
+    public static String getSdfcStateName(String aInCode) {
         if(STATE_MAP.containsKey(aInCode)) {
             return STATE_MAP.get(aInCode);
         }
@@ -166,15 +166,15 @@ public class CalenderUtils {
         return aInCode;
     }
 
-    public static HashMap<String, GregorianCalendar> GetLastNDays(int aInN) {
+    public static HashMap<String, GregorianCalendar> getLastNDays(int aInN) {
 
         HashMap<String, GregorianCalendar> lDays = new HashMap<String, GregorianCalendar>();
         GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();
         while(aInN > 0) {
 
             // Skip Holidays and weekends
-            UpdateCalenderDate(lCal);
-            String lFormattedDate = GetFormattedDate(lCal);
+            updateCalenderDate(lCal);
+            String lFormattedDate = getFormattedDate(lCal);
             lDays.put(lFormattedDate, lCal);
 
             aInN--;
@@ -184,7 +184,7 @@ public class CalenderUtils {
         return lDays;
     }
 
-    public static void UpdateCalenderDate(GregorianCalendar aInCal) {
+    public static void updateCalenderDate(GregorianCalendar aInCal) {
         String lDayName = aInCal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
         if(Objects.equals(lDayName, new String("Sun"))){
             aInCal.add(GregorianCalendar.DATE, -2);

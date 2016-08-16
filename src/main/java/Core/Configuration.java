@@ -1,15 +1,14 @@
 package Core;
 
 import Core.Utils.CalenderUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Created by vthiruvengadam on 8/10/16.
  */
 public class Configuration {
+
+    private static final String niprAlertEndpointField = "NIPR_ALERT_ENDPOINT";
+    private static String getNiprAlertEndpoint;
 
     private static final String niprUserNameField = "NIPR_USERNAME";
     private static String niprUsername;
@@ -44,12 +43,8 @@ public class Configuration {
     private static final String resyncDaysCountField = "RESYNC_DAYS_COUNT";
     private static int resyncDaysCount;
 
-    private static final int DefaultResyncDaysCount = 5;
-    private static final int MaxResyncDaysCount = 14;
-
-    public static int GetRetryInterval() {
-        return reconcilerRetry;
-    }
+    private static final int defaultResyncDaysCount = 5;
+    private static final int maxResyncDaysCount = 14;
 
     public static int GetResyncDaysCount() {
         return resyncDaysCount;
@@ -57,88 +52,113 @@ public class Configuration {
 
     public static void LoadParams() {
 
+        // "https://pdb-services.nipr.com/pdb-alerts-industry-services/services/industry-ws"
+        getNiprAlertEndpoint = System.getenv(niprAlertEndpointField);
+        throwIfEmpty(niprAlertEndpointField, getNiprAlertEndpoint);
+
         niprUsername = System.getenv(niprUserNameField);
-        ThrowIfEmpty(niprUserNameField, niprUsername);
+        throwIfEmpty(niprUserNameField, niprUsername);
 
         niprPassword = System.getenv(niprPasswordField);
-        ThrowIfEmpty(niprPasswordField, niprPassword);
+        throwIfEmpty(niprPasswordField, niprPassword);
 
         salesForceConsumerKey = System.getenv(salesForceConsumerKeyField);
-        ThrowIfEmpty(salesForceConsumerKeyField, salesForceConsumerKey);
+        throwIfEmpty(salesForceConsumerKeyField, salesForceConsumerKey);
 
         salesForceConsumerSecret = System.getenv(salesForceConsumerSecretField);
-        ThrowIfEmpty(salesForceConsumerSecretField, salesForceConsumerSecret);
+        throwIfEmpty(salesForceConsumerSecretField, salesForceConsumerSecret);
 
         salesForceUsername = System.getenv(salesForceUsernameField);
-        ThrowIfEmpty(salesForceUsernameField, salesForceUsername);
+        throwIfEmpty(salesForceUsernameField, salesForceUsername);
 
         salesForcePassword = System.getenv(salesForcePasswordField);
-        ThrowIfEmpty(salesForcePasswordField, salesForcePassword);
+        throwIfEmpty(salesForcePasswordField, salesForcePassword);
 
         sendGridApiKey = System.getenv(sendGridApiKeyField);
+
         alertEmailRecipient = System.getenv(alertEmailRecipientField);
+        throwIfEmpty(alertEmailRecipientField, alertEmailRecipient);
+
         alertEmailSender = System.getenv(alertEmailSenderField);
+        throwIfEmpty(alertEmailSenderField, alertEmailSender);
 
         String lInterval = System.getenv(reconcilerRetryField);
-        if(CalenderUtils.isNullOrWhiteSpace(lInterval)) {
-            reconcilerRetry = 3600000; // Every hour
-        }
-        else {
-            reconcilerRetry = Integer.parseInt(lInterval);
-        }
+        throwIfEmpty(reconcilerRetryField, lInterval);
+        reconcilerRetry = Integer.parseInt(lInterval);
 
         String lDays = System.getenv(resyncDaysCountField);
-        if(CalenderUtils.isNullOrWhiteSpace(lInterval)) {
-            resyncDaysCount = DefaultResyncDaysCount; // Every minute
+        if(CalenderUtils.isNullOrWhiteSpace(lDays)) {
+            resyncDaysCount = defaultResyncDaysCount; // Every minute
         }
         else {
-            resyncDaysCount = Integer.parseInt(lInterval);
-            if(resyncDaysCount > MaxResyncDaysCount) {
+            resyncDaysCount = Integer.parseInt(lDays);
+            if(resyncDaysCount > maxResyncDaysCount) {
                 // We cannot go back beyond MaxResyncDaysCount = 14
-                resyncDaysCount = MaxResyncDaysCount;
+                resyncDaysCount = maxResyncDaysCount;
             }
             else if(resyncDaysCount < 0) {
-                resyncDaysCount = DefaultResyncDaysCount;
+                resyncDaysCount = defaultResyncDaysCount;
             }
         }
     }
 
-    public static String GetNiprAuthToken() {
-        String lVal = niprUsername + ":" + niprPassword;
-        byte[] encodedBytes = Base64.encodeBase64(lVal.getBytes());
-        return "Basic " + new String(encodedBytes);
+    public static String getGetNiprAlertEndpoint() {
+        return getNiprAlertEndpoint;
     }
 
-    public static String GetSalesForceAuthInfo(){
-        String lInfo = "";
-        try {
-            // grant_type=password&client_id=<SALESFORCE_CONSUMER_KEY>&client_secret=<SALESFORCE_CONSUMER_SECRET>&username=<SALESFORCE_USERNAME>&password=<SALESFORCE_PASSWORD>
-            lInfo = "grant_type=password&client_id=" + salesForceConsumerKey + "&client_secret=" +
-                    salesForceConsumerSecret + "&username=" + salesForceUsername + "&password=" + URLEncoder.encode(salesForcePassword, "UTF-8");
-            return lInfo;
-        }
-        catch(Exception ex) {
-            System.out.println("Failed to url encode sales force auth info");
-        }
-        return lInfo;
-    }
-
-    public static String GetSendGridKey() {
+    public static String getSendGridKey() {
         return sendGridApiKey;
     }
 
-    public static String GetAlertEmailRecipient() {
-        return alertEmailRecipient;
+    public static String getNiprUsername() {
+        return niprUsername;
     }
 
-    public static String GetAlertEmailSender() {
+    public static String getNiprPassword() {
+        return niprPassword;
+    }
+
+    public static String getSalesForceConsumerKey() {
+        return salesForceConsumerKey;
+    }
+
+    public static String getSalesForceConsumerSecret() {
+        return salesForceConsumerSecret;
+    }
+
+    public static String getSalesForceUsername() {
+        return salesForceUsername;
+    }
+
+    public static String getSalesForcePassword() {
+        return salesForcePassword;
+    }
+
+    public static String getSendGridApiKey() {
+        return sendGridApiKey;
+    }
+
+    public static String getAlertEmailSender() {
         return alertEmailSender;
     }
 
-    public static void ThrowIfEmpty(String aInDataField, String aInData) {
+    public static String getAlertEmailRecipient() {
+        return alertEmailRecipient;
+    }
+
+    public static int getReconcilerRetry() {
+        return reconcilerRetry;
+    }
+
+    public static int getResyncDaysCount() {
+        return resyncDaysCount;
+    }
+
+    private static void throwIfEmpty(String aInDataField, String aInData) {
 
         if(CalenderUtils.isNullOrWhiteSpace(aInData)) {
             throw new IllegalArgumentException("ENV Field " + aInDataField + " is not set");
         }
     }
+
 }
