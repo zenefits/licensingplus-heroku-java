@@ -3,6 +3,7 @@ package Core;
 import Core.Nipr.LicenseInternal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @RestController
@@ -39,5 +40,10 @@ public class NiprSyncController {
     @RequestMapping(value = "/triggerResync", method = RequestMethod.POST)
     public void triggerResync() {
         LicenseDB.triggerResync();
+    }
+
+    @ModelAttribute
+    public void setResponseHeader(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
     }
 }
