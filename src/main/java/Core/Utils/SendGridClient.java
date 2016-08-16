@@ -9,6 +9,9 @@ import org.json.simple.JSONObject;
 /**
  * Created by vthiruvengadam on 8/15/16.
  */
+//PLEASE RESOLVE all warnings (unused referenced class)
+//PLEASE look into use log4j, so we can check ERROR vs INFO easily
+//PLEASE use lower case as the firstLetter for method
 public class SendGridClient {
 
     private final static String sendGridUrl = "https://api.sendgrid.com/v3/mail/send";
@@ -26,6 +29,7 @@ public class SendGridClient {
     private static String alertEmailSender;
 
     public static String GetSendGridEmailBody(String aInSubject, String aInBody) {
+    	//PLEASE use generics here
         JSONObject obj = new JSONObject();
         obj.put("value", aInBody);
         obj.put("type", "text/plain");

@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by vthiruvengadam on 8/5/16.
  */
+// One of my biggest questions is is the app easy to extend? If I want to sync other information from NIPR?
 public class Reconciler extends Thread {
 
     static int SALES_FORCE_API_BATCH = 200;
@@ -30,6 +31,7 @@ public class Reconciler extends Thread {
     public void run() {
 
         System.out.println("Reconciler: Started the reconciler thread");
+        //Please take a look at SalesforceOAuth, we should not have any hardcoded url in the code base
         SfClient = new SalesForceClient("https://test.salesforce.com/services/oauth2/token", Configuration.GetSalesForceAuthInfo());
 
         SendGridClient.Init(Configuration.GetSendGridKey(), Configuration.GetAlertEmailRecipient(), Configuration.GetAlertEmailSender());
@@ -240,7 +242,8 @@ public class Reconciler extends Thread {
             }
         }
     }
-
+    
+    //you can use Collections.sort() to sort the list
     private List<LicenseInternal>  GetOrderLicenses(HashMap<String, LicenseInternal> aInLicenses) {
 
         List<LicenseInternal> lResidentLicenses = new ArrayList<LicenseInternal>();

@@ -13,6 +13,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Created by vthiruvengadam on 8/10/16.
  */
+
+//can you resolve all the warning in the class?
 public class LicenseDB {
 
     private static final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();

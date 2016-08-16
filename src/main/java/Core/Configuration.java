@@ -9,8 +9,12 @@ import java.net.URLEncoder;
 /**
  * Created by vthiruvengadam on 8/10/16.
  */
-public class Configuration {
 
+// This file should be a proxy for how to read system env file, and we should define all get methods for these system env
+// Currently I think we need to add SALESFORCE_SANDBOX and NIPR_ALERT_ENDPOINT system env in heroku. All config used in our system should be required for user to fill in
+public class Configuration {
+    
+	
     private static final String niprUserNameField = "NIPR_USERNAME";
     private static String niprUsername;
 
@@ -43,7 +47,8 @@ public class Configuration {
 
     private static final String resyncDaysCountField = "RESYNC_DAYS_COUNT";
     private static int resyncDaysCount;
-
+    
+    //can we make these system config, how do we handle if user change the config, will it hotload?
     private static final int DefaultResyncDaysCount = 5;
     private static final int MaxResyncDaysCount = 14;
 
@@ -108,7 +113,8 @@ public class Configuration {
         byte[] encodedBytes = Base64.encodeBase64(lVal.getBytes());
         return "Basic " + new String(encodedBytes);
     }
-
+    
+    //this logic should move to Salesforce package
     public static String GetSalesForceAuthInfo(){
         String lInfo = "";
         try {
@@ -122,7 +128,7 @@ public class Configuration {
         }
         return lInfo;
     }
-
+    
     public static String GetSendGridKey() {
         return sendGridApiKey;
     }

@@ -11,9 +11,11 @@ import java.util.*;
 /**
  * Created by vthiruvengadam on 8/9/16.
  */
+//PLEASE use lower case as first letter for method
 public class CalenderUtils {
 
     public static final HashMap<String, String> STATE_MAP;
+    // CAN you double check the mapping with the map I sent you
     static {
         STATE_MAP = new HashMap<String, String>();
         STATE_MAP.put("AL", "Alabama");
@@ -167,7 +169,7 @@ public class CalenderUtils {
     }
 
     public static HashMap<String, GregorianCalendar> GetLastNDays(int aInN) {
-
+        //always use interface when declare variable
         HashMap<String, GregorianCalendar> lDays = new HashMap<String, GregorianCalendar>();
         GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();
         while(aInN > 0) {

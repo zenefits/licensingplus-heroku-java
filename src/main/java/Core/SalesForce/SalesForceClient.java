@@ -14,6 +14,8 @@ import java.util.List;
 /**
  * Created by vthiruvengadam on 8/9/16.
  */
+//can you rename this class to SalesforceService and just pass in a SalesforceRestClient as contructor argument like I did in python?
+//please resolve any warnings
 public class SalesForceClient {
 
     private String AuthUrl;
