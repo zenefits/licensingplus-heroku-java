@@ -3,6 +3,7 @@ import Core.Nipr.LicenseInternal;
 import Core.Utils.*;
 import Core.Utils.WebUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import com.fasterxml.jackson.databind.*;
@@ -104,6 +105,17 @@ public class SalesForceClient {
                 System.out.println("SalesForceClient: SendData failed UnAuthorized");
                 if(aInRetry) {
                     System.out.println("SalesForceClient: Retry Send Data");
+                    authToken = "";
+                    sendData(aInLicenses, false);
+                }
+            }
+        }
+        catch (HttpClientErrorException httpException) {
+
+            if(httpException.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                System.out.println("SalesForceClient: SendData failed UnAuthorized");
+                if(aInRetry) {
+                    System.out.println("SalesForceClient: Retry Send Data after reauth");
                     authToken = "";
                     sendData(aInLicenses, false);
                 }

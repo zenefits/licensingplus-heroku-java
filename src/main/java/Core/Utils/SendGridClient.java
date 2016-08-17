@@ -6,8 +6,13 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.json.simple.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Created by vthiruvengadam on 8/15/16.
@@ -127,6 +132,59 @@ public class SendGridClient {
         catch (Exception ex) {
             System.out.println("SendGridClientV2: Failed to send Email " + ex.getMessage());
         }
+    }
+
+    public static boolean sendEmailWithAttachment (String aInSubject, String aInBody, String aInFilePath) {
+
+        boolean lStatus = false;
+        if(CalenderUtils.isNullOrWhiteSpace(sendgridUsername)
+                || CalenderUtils.isNullOrWhiteSpace(sendgridPassword)) {
+            System.out.println("SendGridClientV2: No username password set, skipping....");
+            return lStatus;
+        }
+
+        try {
+            File lFile = new File(aInFilePath);
+            if(!lFile.exists()) {
+                System.out.println("SendGridClient: File to be sent as an attachment does not exist " + aInFilePath);
+                return false;
+            }
+            // Read the contents of a file
+            String lFileContents = readFile(aInFilePath, Charset.defaultCharset());
+
+            String lData = "api_user=" + sendgridUsername +
+                    "&api_key=" + sendgridPassword +
+                    "&to=" + alertEmailRecipient +
+                    "&subject=" + URLEncoder.encode(aInSubject, "UTF-8") +
+                    "&text=" + URLEncoder.encode(aInBody, "UTF-8") +
+                    "&from=" + alertEmailSender +
+                    "&files[" + lFile.getName() + "]=" + URLEncoder.encode(lFileContents, "UTF-8");
+            HttpHeaders lHeaders = new HttpHeaders();
+            lHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            ResponseEntity<String> lResponse = WebUtils.postData(sendGridUrlv2, lData, lHeaders, String.class);
+            if ((lResponse.getStatusCode() == HttpStatus.OK)
+                    || (lResponse.getStatusCode() == HttpStatus.ACCEPTED))
+            {
+                System.out.println("SendGridClientV2: Email sent with attachment");
+                lStatus = true;
+            } else {
+                System.out.println("SendGridClientV2: Failed to Send Email with attachement:  " + lResponse.getStatusCode());
+            }
+
+        }
+        catch (Exception ex) {
+            System.out.println("SendGridClientV2: Failed to send Email with attachment " + ex.getMessage());
+        }
+
+        return lStatus;
+    }
+
+    static String readFile(String path, Charset encoding)
+            throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 
 }

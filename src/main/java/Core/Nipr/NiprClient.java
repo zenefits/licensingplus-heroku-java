@@ -49,7 +49,9 @@ public class NiprClient extends WebServiceGatewaySupport {
                 continue;
             }
 
-            System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS");
+            System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS, generating CSV file");
+            // Generate a CSV for it.
+            GenerateAndSendCsvFile(lFormattedDate, lCurrentDayInfo);
 
             // Previous Day is higher
             mergeReports(lCurrentDayInfo, aInOutLatestLicenses);
@@ -155,7 +157,6 @@ public class NiprClient extends WebServiceGatewaySupport {
         PdbAlertsFaultType lFaultType = (PdbAlertsFaultType)lFaultResponse;
         return lFaultType;
     }
-
 
     /*
     NIPR RESPONSE SCHEMA -
@@ -336,6 +337,98 @@ public class NiprClient extends WebServiceGatewaySupport {
             }
         }
         return lPersonNumberByKey;
+    }
+
+    private boolean GenerateAndSendCsvFile(String aInDate, Map<String, LicenseInternal> aInLicenses) {
+        String csvFile = "/tmp/" + aInDate + ".csv";
+        String lSuccessFileName = csvFile + ".sent";
+        File lSuccessFile = new File(lSuccessFileName);
+        if(lSuccessFile.exists()) {
+            System.out.println("NiprClient: CSV file " + csvFile + " has already been sent");
+            return true;
+        }
+
+        boolean lStatus = GenerateCsvFile(csvFile, aInLicenses);
+
+        if(lStatus) {
+            // Email it
+            String lSubject = "Nipr Data For " + aInDate;
+            String lBody = "Please find attached file with Nipr Data For " + aInDate;
+            lStatus = SendGridClient.sendEmailWithAttachment(lSubject, lBody, csvFile);
+            if(lStatus) {
+                // Write a file called aInDate.Sent
+                XmlToCsv.writeFile(lSuccessFileName, "Success");
+            }
+        }
+
+        return lStatus;
+    }
+
+    private boolean GenerateCsvFile(String aInFile, Map<String, LicenseInternal> aInLicenses) {
+        boolean lStatus = false;
+
+        if(new File(aInFile).isFile()) {
+            System.out.println("The csv file " + aInFile + " already exists");
+            return true;
+        }
+
+        FileWriter lWriter = null;
+        try {
+            lWriter = new FileWriter(aInFile);
+            List<String> lLine = Arrays.asList(
+                                        "NpnNumber", "State", "LicenseNumber",
+                                        "EffectiveDate", "ExpirationDate", "ClassName",
+                                        "IsResidentLicense", "IsActive", "LOAName", "IsLOAActive");
+
+            XmlToCsv.writeLine(lWriter, lLine);
+            for(LicenseInternal lLicense : aInLicenses.values()) {
+                if((lLicense.linesOfAuthority != null)
+                    && (lLicense.linesOfAuthority.size() > 0))
+                {
+                    for(LineOfAuthorityInternal loa :lLicense.linesOfAuthority) {
+
+                        lLine = Arrays.asList(
+                                lLicense.npnNumber, lLicense.state,
+                                lLicense.licenseNumber, lLicense.effectiveDate,
+                                lLicense.expirationDate, lLicense.className,
+                                lLicense.isResidentLicense.toString(), lLicense.isActive.toString(),
+                                loa.name, loa.isActive.toString());
+
+                        XmlToCsv.writeLine(lWriter, lLine);
+                    }
+                }
+                else {
+                    lLine = Arrays.asList(
+                            lLicense.npnNumber, lLicense.state,
+                            lLicense.licenseNumber, lLicense.effectiveDate,
+                            lLicense.expirationDate, lLicense.className,
+                            lLicense.isResidentLicense.toString(), lLicense.isActive.toString(),
+                            "", "");
+
+                    XmlToCsv.writeLine(lWriter, lLine);
+                }
+            }
+
+            lWriter.flush();
+            lStatus = true;
+        }
+        catch (IOException ex) {
+            System.out.println("Failed to create CSV for " + aInFile + " due to IO exception " + ex.getMessage());
+        }
+        catch(Exception ex) {
+            System.out.println("Failed to create CS for " + aInFile + " due to exception " + ex.getMessage());
+        }
+        finally {
+            if (lWriter != null) {
+                try {
+                    lWriter.close();
+                } catch (IOException ex) {
+                    // ignore ... any significant errors should already have been
+                    // reported via an IOException from the final flush.
+                }
+            }
+        }
+        return lStatus;
     }
 
 }
