@@ -1,6 +1,7 @@
 package Core;
 
 import Core.Nipr.LicenseInternal;
+import Core.Nipr.NiprSyncStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,11 @@ public class NiprSyncController {
     public List<LicenseInternal> getFailedLicenses(@RequestParam(value="date", defaultValue="") String date) {
 
         return LicenseDB.getFailedLicensesByDate(date);
+    }
+
+    @RequestMapping("/getStatus")
+    public Map<String, NiprSyncStatus> getStatus() {
+        return LicenseDB.getCurrentStatus();
     }
 
     @RequestMapping("/getPendingNiprSyncDates")

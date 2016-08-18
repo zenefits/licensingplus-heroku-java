@@ -7,9 +7,10 @@ public class LineOfAuthorityInternal {
 
     public String name;
 
-    public boolean isActive;
+    public Boolean isActive;
 
     public LineOfAuthorityInternal() {
+        this.name = "";
         this.isActive = false;
     }
 

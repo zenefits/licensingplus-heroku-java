@@ -80,7 +80,7 @@ public class Reconciler extends Thread {
                 // Update in the cache, which also serves the UI
                 LicenseDB.setUnprocessedLicenses(lUnprocessedLicenses);
 
-                LicenseDB.removeNiprSyncDates(lSuccessDates);
+                LicenseDB.updateNiprSyncDates(lSuccessDates);
 
                 UUID lLatestTriggerId = LicenseDB.getResyncTriggerId();
                 if(lLatestTriggerId.compareTo(lResyncTriggerId) != 0) {
