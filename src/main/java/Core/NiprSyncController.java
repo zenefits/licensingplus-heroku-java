@@ -23,7 +23,7 @@ public class NiprSyncController {
     }
 
     @RequestMapping("/getStatus")
-    public List<NiprSyncStatus> getStatus() {
+    public Map<String, NiprSyncStatus> getStatus() {
         return LicenseDB.getCurrentStatus();
     }
 

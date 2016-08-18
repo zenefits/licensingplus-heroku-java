@@ -193,7 +193,7 @@ public class LicenseDB {
         }
     }
 
-    public static List<NiprSyncStatus> getCurrentStatus() {
+    public static Map<String, NiprSyncStatus> getCurrentStatus() {
 
         Map<String, NiprSyncStatus> lCurrentStatuses = new HashMap<String, NiprSyncStatus>();
 
@@ -232,6 +232,6 @@ public class LicenseDB {
         finally {
             readLock.unlock();
         }
-        return new ArrayList<NiprSyncStatus>(lCurrentStatuses.values());
+        return lCurrentStatuses;
     }
 }
