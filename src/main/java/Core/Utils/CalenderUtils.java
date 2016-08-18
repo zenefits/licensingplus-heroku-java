@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -156,6 +157,20 @@ public class CalenderUtils {
         GregorianCalendar lCal = getCalenderTimeFromString(aInSFDCDate);
         int lMonth = lCal.get(Calendar.MONTH) + 1;
         return lMonth + "/" + lCal.get(Calendar.DAY_OF_MONTH) + "/" + lCal.get(Calendar.YEAR);
+    }
+
+    public static String getDateInXmlDateFormat(String aInDate) {
+        String lRetVal = null;
+        try {
+            GregorianCalendar lCal = CalenderUtils.getCalenderTimeFromString(aInDate);
+            XMLGregorianCalendar lXmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(lCal);
+            lRetVal = toSFDCDateFormat(lXmlDate);
+        }
+        catch (Exception ex) {
+            System.out.println("Failed to convert date to xml date format " + aInDate);
+        }
+
+        return lRetVal;
     }
 
     public static String getSdfcStateName(String aInCode) {

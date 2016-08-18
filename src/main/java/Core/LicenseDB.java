@@ -1,8 +1,11 @@
 package Core;
 
 import Core.Nipr.LicenseInternal;
+import Core.Nipr.NiprSyncStatus;
 import Core.Utils.CalenderUtils;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -18,6 +21,7 @@ public class LicenseDB {
     private static final Lock writeLock = readWriteLock.writeLock();
     private static Map<String, LicenseInternal> unprocessedLicenses = new HashMap<String, LicenseInternal>();
     private static Map<String, GregorianCalendar> pendingNiprSyncDates = new HashMap<String, GregorianCalendar>();
+    private static HashSet<String> completedNiprSyncDates = new HashSet<String>();
     private static GregorianCalendar lastSuccessfullSync = null;
     private static UUID resyncTriggerId = UUID.randomUUID();
     private static Thread reconcilerThread = null;
@@ -100,13 +104,19 @@ public class LicenseDB {
 
         System.out.println("LicenseDB: Removing Nipr Sync date " + aInDate);
         GregorianCalendar lCal = CalenderUtils.getCalenderTimeFromString(aInDate);
-        Map<String, GregorianCalendar> lDates = new HashMap<String, GregorianCalendar>();
-        lDates.put(CalenderUtils.getFormattedDate(lCal), lCal);
 
-        removeNiprSyncDates(lDates);
+        writeLock.lock();
+        try {
+            String lKey = CalenderUtils.getFormattedDate(lCal);
+            System.out.println("LicenseDB: Removing date " + lKey + " for Nipr Sync");
+            pendingNiprSyncDates.remove(lKey);
+        }
+        finally {
+            writeLock.unlock();
+        }
     }
 
-    public static void removeNiprSyncDates(Map<String, GregorianCalendar> aInSuccessDates) {
+    public static void updateNiprSyncDates(Map<String, GregorianCalendar> aInSuccessDates) {
 
         GregorianCalendar lToday = (GregorianCalendar) GregorianCalendar.getInstance();
         writeLock.lock();
@@ -114,9 +124,13 @@ public class LicenseDB {
             for(GregorianCalendar lCal : aInSuccessDates.values()) {
 
                 String lKey = CalenderUtils.getFormattedDate(lCal);
-                System.out.println("LicenseDB: Removing date " + lKey + " for Nipr Sync");
+                System.out.println("LicenseDB: Removing date " + lKey + " from pending Nipr Sync dates");
+
                 pendingNiprSyncDates.remove(lKey);
 
+                if(!completedNiprSyncDates.contains(lKey)) {
+                    completedNiprSyncDates.add(lKey);
+                }
                 if(CalenderUtils.isCalenderDaySame(lToday, lCal)) {
                     System.out.println("LicenseDB: Today date " + CalenderUtils.getFormattedDate(lCal) + " is in the dates to be removed, marking last sync as today");
                     lastSuccessfullSync = lToday;
@@ -177,5 +191,47 @@ public class LicenseDB {
         finally {
             writeLock.unlock();
         }
+    }
+
+    public static List<NiprSyncStatus> getCurrentStatus() {
+
+        Map<String, NiprSyncStatus> lCurrentStatuses = new HashMap<String, NiprSyncStatus>();
+
+        readLock.lock();
+        try{
+
+            for(String lCompleteDate : completedNiprSyncDates) {
+                NiprSyncStatus lStatus = new NiprSyncStatus();
+                String lXmlDate = CalenderUtils.getDateInXmlDateFormat(lCompleteDate);
+                if(CalenderUtils.isNullOrWhiteSpace(lXmlDate)) {
+                    continue;
+                }
+                lStatus.setSyncDate(lXmlDate);
+                lCurrentStatuses.put(lXmlDate, lStatus);
+            }
+
+            for(String lPendingDate : pendingNiprSyncDates.keySet()) {
+
+                if(!lCurrentStatuses.containsKey(lPendingDate)) {
+                    NiprSyncStatus lStatus = new NiprSyncStatus();
+                    String lXmlDate = CalenderUtils.getDateInXmlDateFormat(lPendingDate);
+                    if(CalenderUtils.isNullOrWhiteSpace(lXmlDate)) {
+                        continue;
+                    }
+                    lStatus.setSyncDate(lXmlDate);
+                    lCurrentStatuses.put(lPendingDate, lStatus);
+                }
+            }
+
+            for(LicenseInternal lLicense : unprocessedLicenses.values()) {
+                if(lCurrentStatuses.containsKey(lLicense.niprUpdateDate)) {
+                   lCurrentStatuses.get(lLicense.niprUpdateDate).AddLicense(lLicense);
+                }
+            }
+        }
+        finally {
+            readLock.unlock();
+        }
+        return new ArrayList<NiprSyncStatus>(lCurrentStatuses.values());
     }
 }
