@@ -220,8 +220,8 @@ public class Reconciler extends Thread {
                     if(aInAllRequests.containsKey(lKey)) {
 
                         LicenseInternal lLicense = aInAllRequests.get(lKey);
-                        lLicense.lastErrorCode = lLicenseResponse.getErrorCode();
-                        lLicense.lastErrorMessage = lLicenseResponse.getErrorMessage();
+                        lLicense.lastErrorCode = (CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorCode())) ? "UNKNOWN" : lLicenseResponse.getErrorCode();
+                        lLicense.lastErrorMessage = (CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorMessage())) ? "UNKNOWN" : lLicenseResponse.getErrorMessage();;
                         aInOutFailedRequests.put(lKey, lLicense);
                     }
                     else {

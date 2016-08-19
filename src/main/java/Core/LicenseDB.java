@@ -121,8 +121,6 @@ public class LicenseDB {
         triggerResync();
     }
 
-
-
     public static void removeNiprSyncDate(String aInDate) {
 
         System.out.println("LicenseDB: Removing Nipr Sync date " + aInDate);
@@ -245,15 +243,24 @@ public class LicenseDB {
                         continue;
                     }
                     lStatus.setSyncDate(lXmlDate);
+                    lStatus.setErrorMsg("Sync with Nipr to fetch data is not complete. \n");
                     lCurrentStatuses.put(lPendingDate, lStatus);
                 }
             }
 
             for(LicenseInternal lLicense : unprocessedLicenses.values()) {
                 if(lCurrentStatuses.containsKey(lLicense.niprUpdateDate)) {
-                   lCurrentStatuses.get(lLicense.niprUpdateDate).AddLicense(lLicense);
+                    NiprSyncStatus lStatus = lCurrentStatuses.get(lLicense.niprUpdateDate);
+                    lStatus.AddLicense(lLicense.GetCopy());
                 }
             }
+
+            for(Map.Entry<String, NiprSyncStatus> lEntrySet : lCurrentStatuses.entrySet()) {
+                if(!lEntrySet.getValue().getFailedLicenses().isEmpty()) {
+                    lEntrySet.getValue().setErrorMsg("Errors in sending Nipr Data to sales force.");
+                }
+            }
+
         }
         finally {
             readLock.unlock();
