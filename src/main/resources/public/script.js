@@ -180,6 +180,13 @@ Calendar.prototype.generateHTML = function(){
 function syncRange() {
   var fromDate = $('#fromDate').val();
   var toDate = $('#toDate').val();
+  if (fromDate == '') {
+    alert('Please choose a date range to sync.');
+    return;
+  }
+  if (toDate == '') {
+    toDate = fromDate;
+  }
   if (parseDate(fromDate) > parseDate(toDate)) {
     alert('Invalid date range.')
     return;
