@@ -42,17 +42,6 @@ public class LicenseInternal {
         linesOfAuthority = new ArrayList<LineOfAuthorityInternal>();
         isResidentLicense = false;
         isActive = false;
-        npnNumber = "";
-        state = "";
-        licenseNumber = "";
-        effectiveDate = "";
-        expirationDate = "";
-        className = "";
-        isResidentLicense = false;
-        isActive = false;
-        niprUpdateDate = "";
-        lastErrorCode = "";
-        lastErrorMessage = "";
     }
 
     public LicenseInternal GetCopy() {

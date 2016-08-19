@@ -388,22 +388,31 @@ public class NiprClient extends WebServiceGatewaySupport {
                     for(LineOfAuthorityInternal loa :lLicense.linesOfAuthority) {
 
                         lLine = Arrays.asList(
-                                lLicense.npnNumber, lLicense.state,
-                                lLicense.licenseNumber, lLicense.effectiveDate,
-                                lLicense.expirationDate, lLicense.className,
-                                lLicense.isResidentLicense.toString(), lLicense.isActive.toString(),
-                                loa.name, loa.isActive.toString());
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.npnNumber) ? "":lLicense.npnNumber,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.state) ? "":lLicense.state,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.licenseNumber) ? "":lLicense.licenseNumber,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.effectiveDate) ? "":lLicense.effectiveDate,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.expirationDate) ? "":lLicense.expirationDate,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.className) ? "":lLicense.className,
+                                lLicense.isResidentLicense.toString(),
+                                lLicense.isActive.toString(),
+                                CalenderUtils.isNullOrWhiteSpace(loa.name) ? "":loa.name,
+                                loa.isActive.toString());
 
                         XmlToCsv.writeLine(lWriter, lLine);
                     }
                 }
                 else {
                     lLine = Arrays.asList(
-                            lLicense.npnNumber, lLicense.state,
-                            lLicense.licenseNumber, lLicense.effectiveDate,
-                            lLicense.expirationDate, lLicense.className,
-                            lLicense.isResidentLicense.toString(), lLicense.isActive.toString(),
-                            "", "");
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.npnNumber) ? "":lLicense.npnNumber,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.state) ? "":lLicense.state,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.licenseNumber) ? "":lLicense.licenseNumber,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.effectiveDate) ? "":lLicense.effectiveDate,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.expirationDate) ? "":lLicense.expirationDate,
+                                CalenderUtils.isNullOrWhiteSpace(lLicense.className) ? "":lLicense.className,
+                                lLicense.isResidentLicense.toString(),
+                                lLicense.isActive.toString(),
+                                "", "");
 
                     XmlToCsv.writeLine(lWriter, lLine);
                 }

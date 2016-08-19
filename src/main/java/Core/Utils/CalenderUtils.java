@@ -6,6 +6,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -84,6 +85,13 @@ public class CalenderUtils {
         STATE_MAP.put("WI", "Wisconsin");
         STATE_MAP.put("WY", "Wyoming");
         STATE_MAP.put("YT", "Yukon Territory");
+    }
+
+    public static void ValidateDate(String aInDate) {
+        DateTimeFormatter formatter =
+                DateTimeFormat.forPattern("yyyy-MM-dd").withOffsetParsed();
+        // This should throw for invalid dates.
+        formatter.parseDateTime(aInDate);
     }
 
     public static boolean isCalenderDaySame(GregorianCalendar aInCal1, GregorianCalendar aInCal2) {
@@ -171,6 +179,44 @@ public class CalenderUtils {
         }
 
         return lRetVal;
+    }
+
+    public static Map<String, GregorianCalendar> getDatesFromRange(String aInStartDate, String aInEndDate)  throws Exception {
+
+        GregorianCalendar lStartCalDate = getCalenderTimeFromString(aInStartDate);
+        GregorianCalendar lEndCalDate = getCalenderTimeFromString(aInEndDate);
+
+        if(lEndCalDate.compareTo(lStartCalDate) < 0) {
+            throw new InvalidParameterException("End Date: " + aInEndDate + " is before the start date: " + aInEndDate);
+        }
+
+        GregorianCalendar lCurrentDate = lStartCalDate;
+        Map<String, GregorianCalendar> lDates = new HashMap<String, GregorianCalendar>();
+        int lAddedDates = 0;
+
+        while(true) {
+            if(IsWeekEnd(lCurrentDate)) {
+                lCurrentDate.add(GregorianCalendar.DATE, 1);
+                continue;
+            }
+
+            if(lAddedDates > 14) {
+                String lMsg = "Difference between dates " + aInStartDate + " end date " + aInEndDate + " cannot be more than 14 days";
+                System.out.println(lMsg);
+                throw new InvalidParameterException(lMsg);
+            }
+
+            if(lCurrentDate.compareTo(lEndCalDate) <= 0) {
+                lDates.put(getFormattedDate(lCurrentDate), (GregorianCalendar)lCurrentDate.clone());
+                lCurrentDate.add(GregorianCalendar.DATE, 1);
+                lAddedDates++;
+            }
+            else {
+                break;
+            }
+        }
+
+        return lDates;
     }
 
     public static String getSdfcStateName(String aInCode) {

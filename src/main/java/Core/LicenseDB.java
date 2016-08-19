@@ -100,6 +100,29 @@ public class LicenseDB {
         triggerResync();
     }
 
+    public static void addNiprSyncDateRange (String aInStartDate, String aInEndDate) throws Exception {
+
+        System.out.println("LicenseDB: Adding date Range from: " + aInStartDate + " to: " + aInEndDate + " for Nipr Sync");
+        CalenderUtils.ValidateDate(aInStartDate);
+        CalenderUtils.ValidateDate(aInEndDate);
+
+        Map<String, GregorianCalendar> lDates = CalenderUtils.getDatesFromRange(aInStartDate, aInEndDate);
+        writeLock.lock();
+        try {
+            for(Map.Entry<String, GregorianCalendar> lDate : lDates.entrySet()) {
+                System.out.println("LicenseDB: Adding date " + lDate.getKey() + " for Nipr Sync");
+                pendingNiprSyncDates.put(lDate.getKey(), lDate.getValue());
+            }
+        }
+        finally {
+            writeLock.unlock();
+        }
+
+        triggerResync();
+    }
+
+
+
     public static void removeNiprSyncDate(String aInDate) {
 
         System.out.println("LicenseDB: Removing Nipr Sync date " + aInDate);
@@ -162,6 +185,9 @@ public class LicenseDB {
 
     public static List<LicenseInternal> getFailedLicensesByDate(String aInDate) {
 
+        // Convert the date to calender date
+        String lXmlDate = CalenderUtils.getDateInXmlDateFormat(aInDate);
+
         ArrayList<LicenseInternal> lRetVals = new ArrayList<LicenseInternal>();
         readLock.lock();
         try {
@@ -170,7 +196,7 @@ public class LicenseDB {
                     // Add all of them
                     lRetVals.add(lLicense.GetCopy());
                 }
-                else if(Objects.equals(lLicense.niprUpdateDate, aInDate)) {
+                else if(Objects.equals(lLicense.niprUpdateDate, lXmlDate)) {
                     lRetVals.add(lLicense.GetCopy());
                 }
             }
