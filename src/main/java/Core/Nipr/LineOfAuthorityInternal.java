@@ -10,7 +10,6 @@ public class LineOfAuthorityInternal {
     public Boolean isActive;
 
     public LineOfAuthorityInternal() {
-        this.name = "";
         this.isActive = false;
     }
 
