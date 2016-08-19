@@ -1,0 +1,58 @@
+body {
+    padding: 1% 5%;
+}
+
+#calendar table {
+    width: 100%;
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+
+#calendar td {
+    height: 100px;
+    width: 14.28%;
+    border: solid 1px #AAA;
+    vertical-align: top;
+    text-align: center;
+}
+
+#calendar td a {
+    font-size: 10px;
+    text-decoration: none;
+    border: solid 1px #CCC;
+    background-color: #DDD;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.date-label {
+    font-size: 11px;
+    float:  right;
+    padding: 3%;
+    color: #888;
+}
+
+.has-errors {
+    background-color: #FEE;
+}
+
+td.has-data {
+    cursor: pointer;
+}
+
+.error-count {
+    padding: 20px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #666;
+    margin-top: 15px;
+}
+
+.no-data {
+    background-color: #EEE;
+}
+
+button {
+    font-size: 20px;
+    margin: 13px;
+}

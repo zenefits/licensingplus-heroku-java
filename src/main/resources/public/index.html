@@ -1,9 +1,41 @@
 <html>
 <head>
-    <title>Sample "Hello, World" Application</title>
+    <title>licenseplus-niprsync</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
 </head>
-<body bgcolor=white>
-
-<p>This is the home page for the HelloWorld Web application. </p>
+<!-- Back in my day we used tables for formatting, and wrote all our javascript with IE6 support! -->
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-9">
+        <table width="100%">
+          <tr>
+            <td align="right"><button id="prevMonth" class="btn btn-md">Previous</button></td>
+            <td align="center"><h1 id="title"></h1></td>
+            <td align="left"><button id="nextMonth" class="btn btn-md">Next</button></td>
+          </tr>
+        </table>
+        <div id="calendar"></div>
+        <div align="center">
+          <br/>
+          <br/>
+          <br/>
+          From: <input type="date"> &nbsp;&nbsp;To: <input type="date"><br>
+          <br />
+          <button class="btn btn-lg btn-primary">Sync</button>
+        </div>
+      </div>
+      <div class="col-xs-3">
+        <h2 id="infoTitle"></h2>
+        <ul id="failedLicenses"></ul>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
