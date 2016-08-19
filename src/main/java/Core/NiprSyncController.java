@@ -38,6 +38,14 @@ public class NiprSyncController {
         LicenseDB.addNiprSyncDate(date);
     }
 
+    @RequestMapping(value = "/addNiprSyncDateRange", method = RequestMethod.POST)
+    public static void addNiprSyncDateRange (
+            @RequestParam(value="startDate", defaultValue="") String startDate,
+            @RequestParam(value="endDate", defaultValue="") String endDate) throws Exception {
+
+            LicenseDB.addNiprSyncDateRange(startDate, endDate);
+    }
+
     @RequestMapping(value = "/removeNiprSyncDate/{date}", method = RequestMethod.POST)
     public void removeNiprSyncDate(@PathVariable String date) {
         LicenseDB.removeNiprSyncDate(date);
