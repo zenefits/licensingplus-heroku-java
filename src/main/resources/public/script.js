@@ -44,9 +44,9 @@ function syncDate(startDate, endDate) {
   var url = 'https://licensingplus-java.herokuapp.com/addNiprSyncDateRange?startDate=' + startDate + '&endDate=' + endDate;
   $.post(url, null, function(data) {
     if (startDate == endDate) {
-      alert('Date synced: ' + startDate);
+      alert('Sync command sent for date: ' + startDate);
     } else {
-      alert('Date range synced: ' + startDate + ' - ' + endDate);
+      alert('Sync command sent for date range: ' + startDate + ' - ' + endDate);
     }
   });
 }
