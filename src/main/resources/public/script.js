@@ -9,11 +9,16 @@ $(function() {
   currYear = date.getFullYear();
   $("#prevMonth").click(prevMonth);
   $("#nextMonth").click(nextMonth);
+  loadData();
+  setInterval(loadData, 20000);
+});
+
+function loadData() {
   $.get('https://licensingplus-java.herokuapp.com/getStatus', function(data) {
     statusData = data;
     loadMonth(currMonth, currYear);
   });
-});
+}
 
 function prevMonth() {
   if(currMonth == 0) {
@@ -35,8 +40,15 @@ function nextMonth() {
   loadMonth(currMonth, currYear);
 }
 
-function syncDate(date) {
-  alert('Date synced: ' + date);
+function syncDate(startDate, endDate) {
+  var url = 'https://licensingplus-java.herokuapp.com/addNiprSyncDateRange?startDate=' + startDate + '&endDate=' + endDate;
+  $.post(url, null, function(data) {
+    if (startDate == endDate) {
+      alert('Sync command sent for date: ' + startDate + '. Results will appear shortly.');
+    } else {
+      alert('Sync command sent for date range: ' + startDate + ' - ' + endDate + '. Results will appear shortly.');
+    }
+  });
 }
 
 function showInfo() {
@@ -146,7 +158,7 @@ Calendar.prototype.generateHTML = function(){
         }
         html += '</div>';
         if(!status) {
-          html += '<a href="#" onclick="syncDate(\'' + key + '\');">Sync</a>';
+          html += '<a href="#" onclick="syncDate(\'' + key + '\', \'' + key + '\');">Sync</a>';
         }
         day++;
       }
@@ -163,6 +175,30 @@ Calendar.prototype.generateHTML = function(){
 
   this.html = html;
 }
+
+
+function syncRange() {
+  var fromDate = $('#fromDate').val();
+  var toDate = $('#toDate').val();
+  if (fromDate == '') {
+    alert('Please choose a date range to sync.');
+    return;
+  }
+  if (toDate == '') {
+    toDate = fromDate;
+  }
+  if (parseDate(fromDate) > parseDate(toDate)) {
+    alert('Invalid date range.')
+    return;
+  }
+  syncDate(fromDate, toDate);
+}
+
+function parseDate(s) {
+  var b = s.split(/\D/);
+  return new Date(b[0], --b[1], b[2]);
+}
+
 
 Calendar.prototype.getHTML = function() {
   return this.html;
