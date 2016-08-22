@@ -56,13 +56,15 @@ function showInfo() {
     // clicked sync button
     return;
   }
-  console.log(event.target);
-  console.log();
   var date = $(event.target).closest('td').attr('id')
-  $('#infoTitle').text(date);
+  $('#infoTitle').text('Errors for ' + date);
+  $('#infoError').text(calendar.statusData[date].errorMsg);
   $('#failedLicenses').empty();
   $(calendar.statusData[date].failedLicenses).each(function(index, item) {
-    $('#failedLicenses').append('<li>' + item.licenseNumber + '</li>');
+    var groupItem = $('<li class="list-group-item"></li>');
+    $(groupItem).append('<h4 class="list-group-item-heading">' + item.licenseNumber + '</h4>');
+    $(groupItem).append('<p class="list-group-item-text">' + item.lastErrorMessage + '</p>');
+    $('#failedLicenses').append(groupItem);
   });
 }
 
