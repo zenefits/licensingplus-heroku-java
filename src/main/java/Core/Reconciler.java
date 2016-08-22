@@ -212,6 +212,10 @@ public class Reconciler extends Thread {
                 if(lLicenseResponse.isSuccess()){
                     System.out.println("Reconciler: License Key " + lKey + " successfully updated in SDFC");
                 }
+                else if(CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorCode())
+                        && Objects.equals(lLicenseResponse.getErrorCode(), new String("STALE_DATA_FOUND"))) {
+                    System.out.println("Reconciler: License Key " + lKey + " ignore stale data error");
+                }
                 else
                 {
                     lMsg = "Reconciler: License Key " + lKey + " failed to send " + lLicenseResponse.getErrorDescription();
@@ -220,8 +224,8 @@ public class Reconciler extends Thread {
                     if(aInAllRequests.containsKey(lKey)) {
 
                         LicenseInternal lLicense = aInAllRequests.get(lKey);
-                        lLicense.lastErrorCode = lLicenseResponse.getErrorCode();
-                        lLicense.lastErrorMessage = lLicenseResponse.getErrorMessage();
+                        lLicense.lastErrorCode = (CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorCode())) ? "UNKNOWN" : lLicenseResponse.getErrorCode();
+                        lLicense.lastErrorMessage = (CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorMessage())) ? "UNKNOWN" : lLicenseResponse.getErrorMessage();;
                         aInOutFailedRequests.put(lKey, lLicense);
                     }
                     else {

@@ -32,10 +32,8 @@ public class LicenseInternal {
 
     public String niprUpdateDate;
 
-    @JsonIgnore
     public String lastErrorCode;
 
-    @JsonIgnore
     public String lastErrorMessage;
 
     public LicenseInternal() {
