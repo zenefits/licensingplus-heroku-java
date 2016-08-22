@@ -33,11 +33,12 @@ body {
 }
 
 .has-errors {
-    background-color: #FEE;
+    background-color: #FEE!important;
 }
 
 td.has-data {
     cursor: pointer;
+    background-color: #EFE;
 }
 
 .error-count {
@@ -59,4 +60,38 @@ button {
 
 h4.list-group-item-heading {
 
+}
+
+#legend {
+    padding: 5px;
+    border: solid 1px #999;
+    float: left;
+    background-color: #FEFEFE;
+    margin-top: 10px;
+    padding-right: 20px;
+}
+
+.legend-key {
+    width: 25px;
+    border: solid 1px #999;
+    height 25px;
+    float: left;
+    margin-right: 10px;
+}
+
+.key-item {
+    clear: both;
+    margin-bottom: 5px;
+}
+
+.unsynced {
+    background-color: #EEE;
+}
+
+.synced {
+    background-color: #EFE;
+}
+
+.errors {
+    background-color: #FEE;
 }
