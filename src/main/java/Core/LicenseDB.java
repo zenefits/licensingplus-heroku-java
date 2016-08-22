@@ -231,6 +231,7 @@ public class LicenseDB {
                     continue;
                 }
                 lStatus.setSyncDate(lXmlDate);
+                lStatus.setStatus(true);
                 lCurrentStatuses.put(lXmlDate, lStatus);
             }
 
@@ -244,6 +245,7 @@ public class LicenseDB {
                     }
                     lStatus.setSyncDate(lXmlDate);
                     lStatus.setErrorMsg("Sync with Nipr to fetch data is not complete. \n");
+                    lStatus.setStatus(false);
                     lCurrentStatuses.put(lPendingDate, lStatus);
                 }
             }
@@ -251,6 +253,7 @@ public class LicenseDB {
             for(LicenseInternal lLicense : unprocessedLicenses.values()) {
                 if(lCurrentStatuses.containsKey(lLicense.niprUpdateDate)) {
                     NiprSyncStatus lStatus = lCurrentStatuses.get(lLicense.niprUpdateDate);
+                    lStatus.setStatus(false);
                     lStatus.AddLicense(lLicense.GetCopy());
                 }
             }
