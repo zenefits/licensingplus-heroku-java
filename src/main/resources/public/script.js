@@ -14,7 +14,7 @@ $(function() {
 });
 
 function loadData() {
-  $.get('https://licensingplus-java.herokuapp.com/getStatus', function(data) {
+  $.get('/getStatus', function(data) {
     statusData = data;
     loadMonth(currMonth, currYear);
   });
