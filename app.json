@@ -18,7 +18,7 @@
     "SALESFORCE_PASSWORD": "",
     "SALESFORCE_CONSUMER_KEY": "",
     "SALESFORCE_CONSUMER_SECRET": "",
-    "SALESFORCE_AUTH_URL": ""
+    "SALESFORCE_AUTH_URL": "",
     "EMAIL_ALERT_RECIPIENT": "",
     "EMAIL_ALERT_SENDER" : "",
     "RESYNC_DAYS_COUNT" : "5",
@@ -35,18 +35,6 @@
   "addons": [
     {
       "plan":"logentries:le_tryit"
-    },
-    {
-      "plan": "heroku-postgresql:hobby-basic"
-    },
-    {
-      "plan": "newrelic:wayne"
-    },
-    {
-      "plan": "proximo:development"
-    },
-    {
-      "plan": "scheduler:standard"
     },
     {
       "plan": "sendgrid:starter"
