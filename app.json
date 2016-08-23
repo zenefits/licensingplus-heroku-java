@@ -18,8 +18,12 @@
     "SALESFORCE_PASSWORD": "",
     "SALESFORCE_CONSUMER_KEY": "",
     "SALESFORCE_CONSUMER_SECRET": "",
+    "SALESFORCE_AUTH_URL": ""
+    "EMAIL_ALERT_RECIPIENT": "",
+    "EMAIL_ALERT_SENDER" : "",
+    "RESYNC_DAYS_COUNT" : "5",
+    "RETRY_INTERVAL" : "36000000",
     "TZ": "America/Los_Angeles",
-    "EMAIL_RECIPIENT": "",
     "JAVA_TOOL_OPTIONS": "-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+UseConcMarkSweepGC"
   },
   "formation": {
