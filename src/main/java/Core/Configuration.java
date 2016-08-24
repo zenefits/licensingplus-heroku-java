@@ -135,6 +135,10 @@ public class Configuration {
     }
 
     public static boolean IsAuthenticated(String aInAuthHeader) {
+        if(CalenderUtils.isNullOrWhiteSpace(aInAuthHeader)) {
+            return false;
+        }
+        
         if(!Objects.equals(expectedAuthHeader, new String(aInAuthHeader))) {
             return false;
         }
