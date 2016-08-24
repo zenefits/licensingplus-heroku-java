@@ -79,11 +79,20 @@ function syncDate(startDate, endDate) {
 
   request.done(function(data) {
     console.log( "Request  success");
+    var lTimeout = 7000;
     if (startDate == endDate) {
       alert('Sync command sent for date: ' + startDate + '. Results will appear shortly.');
     } else {
       alert('Sync command sent for date range: ' + startDate + ' - ' + endDate + '. Results will appear shortly.');
+      lTimeout = 15000;
     }
+
+    document.getElementById("loader").style.display = "inline";
+
+    setTimeout(function () {
+      document.getElementById("loader").style.display = "none";
+    }, lTimeout);
+
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -213,7 +222,6 @@ Calendar.prototype.generateHTML = function(){
         status = data.status;
         errorCount = data.failedLicenses.length;
       }
-      console.log(data);
       var cssClass = 'calendar-day ';
       cssClass += (!hasData?'no-data ':'has-data ');
       if(!status) {

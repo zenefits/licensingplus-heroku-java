@@ -138,7 +138,7 @@ public class Configuration {
         if(CalenderUtils.isNullOrWhiteSpace(aInAuthHeader)) {
             return false;
         }
-        
+
         if(!Objects.equals(expectedAuthHeader, new String(aInAuthHeader))) {
             return false;
         }
