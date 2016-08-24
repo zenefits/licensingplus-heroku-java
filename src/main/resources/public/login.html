@@ -1,19 +1,23 @@
-<html>
-<head>
-    <title>licenseplus-niprsync</title>
-    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-    <script src="script.js"></script>
-    <link rel="stylesheet" href="style.css" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login: licenseplus-niprsync</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-</head>
-<!-- Back in my day we used tables for formatting, and wrote all our javascript with IE6 support! -->
-<body>
-
-Username: <input type="text" id="username"> <br><br><br><br> Password: <input type="password" id="password"><br>
-<br />
-<button class="btn btn-lg btn-primary" id="loginButton" onClick="login();">Login</button>
-
-</body>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <input type="text" id="username" class="form-control" placeholder="Username" required autofocus>
+        <input type="password" id="password" class="form-control" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" onClick="login();">Sign in</button>
+      </form>
+    </div>
+  </body>
 </html>
