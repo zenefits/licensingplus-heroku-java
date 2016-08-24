@@ -1,11 +1,20 @@
 package Core;
 
 import Core.Utils.CalenderUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
+
+import java.util.Objects;
 
 /**
  * Created by vthiruvengadam on 8/10/16.
  */
 public class Configuration {
+
+    private static final String usernameField = "USERNAME";
+    private static String username;
+
+    private static final String passwordField = "PASSWORD";
+    private static String password;
 
     private static final String niprAlertEndpointField = "NIPR_ALERT_ENDPOINT";
     private static String getNiprAlertEndpoint;
@@ -55,11 +64,19 @@ public class Configuration {
     private static final int defaultResyncDaysCount = 5;
     private static final int maxResyncDaysCount = 14;
 
+    private static String expectedAuthHeader = "";
+
     public static int GetResyncDaysCount() {
         return resyncDaysCount;
     }
 
     public static void LoadParams() {
+
+        username = System.getenv(usernameField);
+        password = System.getenv(passwordField);
+        String s = username + ":" + password;
+        byte[] encodedBytes = Base64.encodeBase64(s.getBytes());
+        expectedAuthHeader = "Basic " + new String(encodedBytes);
 
         // "https://pdb-services.nipr.com/pdb-alerts-industry-services/services/industry-ws"
         getNiprAlertEndpoint = System.getenv(niprAlertEndpointField);
@@ -115,6 +132,22 @@ public class Configuration {
                 resyncDaysCount = defaultResyncDaysCount;
             }
         }
+    }
+
+    public static boolean IsAuthenticated(String aInAuthHeader) {
+        if(!Objects.equals(expectedAuthHeader, new String(aInAuthHeader))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static String getUsername() {
+        return username;
+    }
+
+    public static String getPassword() {
+        return password;
     }
 
     public static String getGetNiprAlertEndpoint() {

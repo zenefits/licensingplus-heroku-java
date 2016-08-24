@@ -2,9 +2,11 @@ package Core;
 
 import Core.Nipr.LicenseInternal;
 import Core.Nipr.NiprSyncStatus;
+import Core.Utils.CalenderUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @RestController
@@ -12,52 +14,97 @@ public class NiprSyncController {
 
     @RequestMapping("/")
     public String index() {
-        // TODO: Load the HTML FILE and return
         return "Welcome to LicensePlus Nipr Sync Portal";
     }
 
     @RequestMapping("/getFailedLicenses")
-    public List<LicenseInternal> getFailedLicenses(@RequestParam(value="date", defaultValue="") String date) {
+    public List<LicenseInternal> getFailedLicenses(@RequestParam(value="date", defaultValue="") String date,
+                                                   HttpServletRequest request, HttpServletResponse response) {
+        if(!isAuthorized(request, response)) {
+            return null;
+        }
 
         return LicenseDB.getFailedLicensesByDate(date);
     }
 
     @RequestMapping("/getStatus")
-    public Map<String, NiprSyncStatus> getStatus() {
+    public Map<String, NiprSyncStatus> getStatus(HttpServletRequest request, HttpServletResponse response) {
+
+        if(!isAuthorized(request, response)) {
+            return null;
+        }
+
         return LicenseDB.getCurrentStatus();
     }
 
     @RequestMapping("/getPendingNiprSyncDates")
-    public List<String> getPendingNiprSyncDates() {
+    public List<String> getPendingNiprSyncDates(HttpServletRequest request, HttpServletResponse response) {
+
+        if(!isAuthorized(request, response)) {
+            return null;
+        }
+
         Map<String, GregorianCalendar> lNiprSyncDates = LicenseDB.getPendingNiprSyncDates();
         return new ArrayList<String>(lNiprSyncDates.keySet());
     }
 
-    @RequestMapping(value = "/addNiprSyncDate/{date}", method = RequestMethod.POST)
-    public void addNiprSyncDate(@PathVariable String date) {
-        LicenseDB.addNiprSyncDate(date);
-    }
-
     @RequestMapping(value = "/addNiprSyncDateRange", method = RequestMethod.POST)
-    public static void addNiprSyncDateRange (
+    public void addNiprSyncDateRange (
             @RequestParam(value="startDate", defaultValue="") String startDate,
-            @RequestParam(value="endDate", defaultValue="") String endDate) throws Exception {
+            @RequestParam(value="endDate", defaultValue="") String endDate,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
 
-            LicenseDB.addNiprSyncDateRange(startDate, endDate);
+        if(!isAuthorized(request, response)) {
+            return;
+        }
+
+        LicenseDB.addNiprSyncDateRange(startDate, endDate);
     }
 
     @RequestMapping(value = "/removeNiprSyncDate/{date}", method = RequestMethod.POST)
-    public void removeNiprSyncDate(@PathVariable String date) {
+    public void removeNiprSyncDate(@PathVariable String date,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
+
+        if(!isAuthorized(request, response)) {
+            return;
+        }
+
         LicenseDB.removeNiprSyncDate(date);
     }
 
     @RequestMapping(value = "/triggerResync", method = RequestMethod.POST)
-    public void triggerResync() {
+    public void triggerResync(HttpServletRequest request,
+                              HttpServletResponse response) {
+        if(!isAuthorized(request, response)) {
+            return;
+        }
+
         LicenseDB.triggerResync();
+    }
+
+    @RequestMapping(value = "/authorize", method = RequestMethod.POST)
+    public void authorize(HttpServletRequest request, HttpServletResponse response) {
+
+        if(isAuthorized(request, response)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
     }
 
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
+    }
+
+    private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) {
+        String lAuthHeader = request.getHeader("Authorization");
+        if(!Configuration.IsAuthenticated(lAuthHeader)) {
+            System.out.println("Authentication Failed");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return false;
+        }
+
+        return true;
     }
 }

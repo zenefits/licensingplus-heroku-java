@@ -4,6 +4,12 @@ var calendar = null;
 var statusData = null;
 
 $(function() {
+
+  var path = window.location.pathname;
+  if(path.toLowerCase().indexOf('index.html') == -1 ) {
+    return;
+  }
+
   var date = new Date();
   currMonth = date.getMonth();
   currYear = date.getFullYear();
@@ -14,9 +20,29 @@ $(function() {
 });
 
 function loadData() {
-  $.get('/getStatus', function(data) {
+
+  var request = $.ajax({
+    url: "/getStatus",
+    type: "GET",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader ("Authorization", "Basic " + btoa(localStorage.getItem("g_username") + ":" + localStorage.getItem("g_password")));
+    },
+  });
+
+  request.done(function(data) {
+    console.log( "Request  success");
     statusData = data;
     loadMonth(currMonth, currYear);
+  });
+
+  request.fail(function(jqXHR, textStatus) {
+    if(jqXHR.status == '403') {
+      console.log('Redirect to Login Page');
+      window.location.href = '/login.html';
+    }
+    else {
+      console.log( "Request failed: " + textStatus + " " + jqXHR.status);
+    }
   });
 }
 
@@ -41,13 +67,58 @@ function nextMonth() {
 }
 
 function syncDate(startDate, endDate) {
-  var url = 'https://licensingplus-java.herokuapp.com/addNiprSyncDateRange?startDate=' + startDate + '&endDate=' + endDate;
-  $.post(url, null, function(data) {
+
+  var url = '/addNiprSyncDateRange?startDate=' + startDate + '&endDate=' + endDate;
+  var request = $.ajax({
+    url: url,
+    type: "POST",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader ("Authorization", "Basic " + btoa(localStorage.getItem("g_username") + ":" + localStorage.getItem("g_password")));
+    },
+  });
+
+  request.done(function(data) {
+    console.log( "Request  success");
     if (startDate == endDate) {
       alert('Sync command sent for date: ' + startDate + '. Results will appear shortly.');
     } else {
       alert('Sync command sent for date range: ' + startDate + ' - ' + endDate + '. Results will appear shortly.');
     }
+  });
+
+  request.fail(function(jqXHR, textStatus) {
+    if(jqXHR.status == '403') {
+      console.log('Redirect to Login Page');
+      window.location.href = '/login.html';
+    }
+    else {
+      console.log( "Request failed: " + textStatus + " " + jqXHR.status);
+      alert('Failed to send a sync request to the server');
+    }
+  });
+}
+
+function login() {
+  var username = $('#username').val();
+  var password = $('#password').val();
+
+  var request = $.ajax({
+    url: "/authorize",
+    type: "POST",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader ("Authorization", "Basic " + btoa(username + ":" + password));
+    },
+  });
+
+  request.done(function(data) {
+    console.log( "Login  success redirecting to index.html");
+    localStorage.setItem("g_username",username);
+    localStorage.setItem("g_password",password);
+    window.location.href = '/index.html';
+  });
+
+  request.fail(function(jqXHR, textStatus) {
+    alert('Login Failed')
   });
 }
 
