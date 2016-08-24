@@ -13,8 +13,10 @@ import java.util.*;
 public class NiprSyncController {
 
     @RequestMapping("/")
-    public String index() {
-        return "Welcome to LicensePlus Nipr Sync Portal";
+    public void index(HttpServletRequest request, HttpServletResponse response) {
+
+        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+        response.setHeader("Location", "/login.html");
     }
 
     @RequestMapping("/getFailedLicenses")
