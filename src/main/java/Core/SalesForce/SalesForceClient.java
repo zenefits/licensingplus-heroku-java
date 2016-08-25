@@ -2,12 +2,9 @@ package Core.SalesForce;
 import Core.Nipr.LicenseInternal;
 import Core.Utils.*;
 import Core.Utils.WebUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import com.fasterxml.jackson.databind.*;
-import org.springframework.web.util.*;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -17,15 +14,16 @@ import java.util.List;
  * Created by vthiruvengadam on 8/9/16.
  */
 public class SalesForceClient {
-
-    private String authUrl;
+	
+	private static final String OAUTH_ENDPOINT = "https://%s.salesforce.com/services/oauth2/token";
+	private String authUrl; 
     private String authToken;
     private String syncUrl;
     private String syncUrlSuffix = "/services/apexrest/nipr/sync/license";
     private String formEncodedAuthInfo;
 
-    public SalesForceClient(String aInAuthUrl, String aInConsumerKey, String aInConsumerSecret, String aInUsername, String aInPassword) {
-        authUrl = aInAuthUrl;
+    public SalesForceClient(Boolean isSalesforceSandbox, String aInConsumerKey, String aInConsumerSecret, String aInUsername, String aInPassword) {
+        authUrl = String.format(OAUTH_ENDPOINT, isSalesforceSandbox ? "test" : "login");
         authToken = "";
         formEncodedAuthInfo = getSalesForceAuthInfo(aInConsumerKey, aInConsumerSecret, aInUsername, aInPassword);
     }
@@ -39,7 +37,7 @@ public class SalesForceClient {
         lHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         // send request and parse result
         ResponseEntity<String> loginResponse = WebUtils.postData(
-                authUrl, lFormEncoded, lHeaders, String.class);
+        		authUrl, lFormEncoded, lHeaders, String.class);
 
         if (loginResponse.getStatusCode() == HttpStatus.OK) {
             System.out.println("SalesForceClient: Auth was a success");
