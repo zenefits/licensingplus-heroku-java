@@ -37,8 +37,8 @@ public class Configuration {
     private static final String salesForcePasswordField = "SALESFORCE_PASSWORD";
     private static String salesForcePassword;
 
-    private static final String salesForceAuthUrlField = "SALESFORCE_AUTH_URL";
-    private static String salesForceAuthUrl;
+    private static final String salesForceSandboxField = "SALESFORCE_SANDBOX";
+    private static String salesForceSandbox;
 
     private static final String sendGridApiKeyField = "SENDGRID_API_KEY";
     private static String sendGridApiKey;
@@ -100,9 +100,9 @@ public class Configuration {
         salesForcePassword = System.getenv(salesForcePasswordField);
         throwIfEmpty(salesForcePasswordField, salesForcePassword);
 
-        // https://test.salesforce.com/services/oauth2/token
-        salesForceAuthUrl = System.getenv(salesForceAuthUrlField);
-        throwIfEmpty(salesForceAuthUrlField, salesForceAuthUrl);
+        //is this sandbox
+        salesForceSandbox = System.getenv(salesForceSandboxField);
+        throwIfEmpty(salesForceSandboxField, salesForceSandbox);
 
         sendGridApiKey = System.getenv(sendGridApiKeyField);
         sendGridUsername = System.getenv(sendGridUsernameField);
@@ -170,8 +170,12 @@ public class Configuration {
         return niprPassword;
     }
 
-    public static String getSalesForceAuthUrl() {
-        return salesForceAuthUrl;
+    public static Boolean isSalesforceSandbox() {
+        try {
+        	return Boolean.valueOf(salesForceSandbox);
+        } catch (Exception e) {
+        	return false;
+        }
     }
 
     public static String getSalesForceConsumerKey() {
