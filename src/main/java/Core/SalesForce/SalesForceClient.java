@@ -97,6 +97,7 @@ public class SalesForceClient {
 
             if (lResponse.getStatusCode() == HttpStatus.OK) {
                 String lResponseData = lResponse.getBody();
+                System.out.println("SalesForceClient: Response data " + lResponseData);
                 lLicenseResponses = WebUtils.getResponseFromJson(lResponseData);
                 System.out.println("SalesForceClient: Response count " + lLicenseResponses.size());
 

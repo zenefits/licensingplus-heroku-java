@@ -209,7 +209,7 @@ public class Reconciler extends Thread {
             // Check sales force response and record failed requests.
             for(LicenseResponse lLicenseResponse : lLicenseResponses) {
                 String lKey = lLicenseResponse.getKey();
-                if(lLicenseResponse.isSuccess()){
+                if(lLicenseResponse.isSuccessVal()){
                     System.out.println("Reconciler: License Key " + lKey + " successfully updated in SDFC");
                 }
                 else if(CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorCode())

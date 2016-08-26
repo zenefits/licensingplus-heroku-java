@@ -102,7 +102,7 @@ public class Configuration {
 
         //is this sandbox
         salesForceSandbox = System.getenv(salesForceSandboxField);
-        throwIfEmpty(salesForceSandboxField, salesForceSandbox);
+        //throwIfEmpty(salesForceSandboxField, salesForceSandbox);
 
         sendGridApiKey = System.getenv(sendGridApiKeyField);
         sendGridUsername = System.getenv(sendGridUsernameField);
