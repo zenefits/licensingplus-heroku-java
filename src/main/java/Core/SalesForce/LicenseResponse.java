@@ -9,13 +9,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class LicenseResponse {
 
     private String key;
-    private boolean isSuccessVal;
-    private String isSuccess;
+    private boolean isSuccess;
     private String errorMessage;
     private String errorCode;
 
     public LicenseResponse() {
-        isSuccessVal = false;
+        isSuccess = false;
     }
     public String getKey() {
         return key;
@@ -25,6 +24,9 @@ public class LicenseResponse {
         this.key = key;
     }
 
+    public void setIsSuccess(boolean isSuccess) {
+        this.isSuccess = isSuccess;
+    }
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
@@ -34,16 +36,8 @@ public class LicenseResponse {
         this.errorCode = errorCode;
     }
 
-    public boolean isSuccessVal() {
-        return Boolean.parseBoolean((String)isSuccess);
-    }
-
-    public String getIsSuccess() {
+    public boolean isSuccess() {
         return isSuccess;
-    }
-
-    public void setIsSuccess(String isSuccess) {
-        this.isSuccess = isSuccess;
     }
 
     public String getErrorMessage() {
