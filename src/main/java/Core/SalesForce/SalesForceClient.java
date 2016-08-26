@@ -87,7 +87,8 @@ public class SalesForceClient {
         try {
             ObjectMapper lMapper = new ObjectMapper();
             lJsonData = lMapper.writeValueAsString(aInLicenses);
-
+            System.out.println("Data sent to SFDC: " + lJsonData);
+            
             HttpHeaders lHeaders = new HttpHeaders();
             lHeaders.setContentType(MediaType.APPLICATION_JSON);
 
