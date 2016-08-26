@@ -19,7 +19,7 @@ public class SalesForceClient {
 	private String authUrl; 
     private String authToken;
     private String syncUrl;
-    private String syncUrlSuffix = "/services/apexrest/nipr/license";
+    private String syncUrlSuffix = "/services/apexrest/LicensingPlus/nipr/sync/license";
     private String formEncodedAuthInfo;
 
     public SalesForceClient(Boolean isSalesforceSandbox, String aInConsumerKey, String aInConsumerSecret, String aInUsername, String aInPassword) {
