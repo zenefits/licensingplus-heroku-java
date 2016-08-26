@@ -31,7 +31,7 @@ public class Reconciler extends Thread {
 
         System.out.println("Reconciler: Started the reconciler thread");
         SfClient = new SalesForceClient(
-                        Configuration.getSalesForceAuthUrl(),
+                        Configuration.isSalesforceSandbox(),
                         Configuration.getSalesForceConsumerKey(),
                         Configuration.getSalesForceConsumerSecret(),
                         Configuration.getSalesForceUsername(),
