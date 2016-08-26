@@ -202,14 +202,13 @@ public class Reconciler extends Thread {
 
         String lMsg = "";
         System.out.println("Reconciler: Call to Post to sales force, size " + aInLicenses.size() + " retry " + aInRetry);
-        boolean lFailed = false;
         try {
             List<LicenseResponse> lLicenseResponses = SfClient.sendData(aInLicenses, true);
 
             // Check sales force response and record failed requests.
             for(LicenseResponse lLicenseResponse : lLicenseResponses) {
                 String lKey = lLicenseResponse.getKey();
-                if(lLicenseResponse.isSuccessVal()){
+                if(lLicenseResponse.isSuccess()){
                     System.out.println("Reconciler: License Key " + lKey + " successfully updated in SDFC");
                 }
                 else if(CalenderUtils.isNullOrWhiteSpace(lLicenseResponse.getErrorCode())
