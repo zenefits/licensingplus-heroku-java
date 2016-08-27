@@ -91,7 +91,7 @@
                                       <xs:element name="License">
                                         <xs:complexType>
                                           <xs:sequence>
-                                            <xs:element type="xs:int" name="LicenseNumberId"/>
+                                            <xs:element type="xs:string" name="LicenseNumberId"/>
                                             <xs:element name="LicensePeriod">
                                               <xs:complexType mixed="true">
                                                 <xs:sequence>

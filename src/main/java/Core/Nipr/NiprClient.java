@@ -272,7 +272,7 @@ public class NiprClient extends WebServiceGatewaySupport {
 
                 //System.out.println("Person " + lPersonRef + " Issued License on " + lLicense.getIssueDate());
                 LicenseInternal lLicenseInt = new LicenseInternal();
-                lLicenseInt.licenseNumber = Integer.toString(lLicense.getLicenseNumberId());
+                lLicenseInt.licenseNumber = lLicense.getLicenseNumberId();
                 XMLGregorianCalendar lCal = lLicense.getIssueDate();
                 lLicenseInt.effectiveDate = CalenderUtils.toSFDCDateFormat(lCal);
                 LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.License.LicensePeriod lPeriod = lLicense.getLicensePeriod();

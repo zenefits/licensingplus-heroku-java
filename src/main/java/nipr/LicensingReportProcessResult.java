@@ -157,7 +157,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *                                                               &lt;complexContent>
  *                                                                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                                                                   &lt;sequence>
- *                                                                     &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *                                                                     &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                                                                     &lt;element name="LicensePeriod">
  *                                                                       &lt;complexType>
  *                                                                         &lt;complexContent>
@@ -417,7 +417,7 @@ public class LicensingReportProcessResult {
      *                                                     &lt;complexContent>
      *                                                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                                                         &lt;sequence>
-     *                                                           &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+     *                                                           &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                                                           &lt;element name="LicensePeriod">
      *                                                             &lt;complexType>
      *                                                               &lt;complexContent>
@@ -836,7 +836,7 @@ public class LicensingReportProcessResult {
          *                                           &lt;complexContent>
          *                                             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *                                               &lt;sequence>
-         *                                                 &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+         *                                                 &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *                                                 &lt;element name="LicensePeriod">
          *                                                   &lt;complexType>
          *                                                     &lt;complexContent>
@@ -1005,7 +1005,7 @@ public class LicensingReportProcessResult {
              *                                 &lt;complexContent>
              *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
              *                                     &lt;sequence>
-             *                                       &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+             *                                       &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
              *                                       &lt;element name="LicensePeriod">
              *                                         &lt;complexType>
              *                                           &lt;complexContent>
@@ -1158,7 +1158,7 @@ public class LicensingReportProcessResult {
                  *                       &lt;complexContent>
                  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
                  *                           &lt;sequence>
-                 *                             &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+                 *                             &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
                  *                             &lt;element name="LicensePeriod">
                  *                               &lt;complexType>
                  *                                 &lt;complexContent>
@@ -1279,7 +1279,7 @@ public class LicensingReportProcessResult {
                      *             &lt;complexContent>
                      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
                      *                 &lt;sequence>
-                     *                   &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+                     *                   &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
                      *                   &lt;element name="LicensePeriod">
                      *                     &lt;complexType>
                      *                       &lt;complexContent>
@@ -1469,7 +1469,7 @@ public class LicensingReportProcessResult {
                          *   &lt;complexContent>
                          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
                          *       &lt;sequence>
-                         *         &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+                         *         &lt;element name="LicenseNumberId" type="{http://www.w3.org/2001/XMLSchema}string"/>
                          *         &lt;element name="LicensePeriod">
                          *           &lt;complexType>
                          *             &lt;complexContent>
@@ -1508,8 +1508,8 @@ public class LicensingReportProcessResult {
                         })
                         public static class License {
 
-                            @XmlElement(name = "LicenseNumberId", namespace = "http://www.acord.org/schema/data/draft/ReusableDataComponents/1")
-                            protected int licenseNumberId;
+                            @XmlElement(name = "LicenseNumberId", namespace = "http://www.acord.org/schema/data/draft/ReusableDataComponents/1", required = true)
+                            protected String licenseNumberId;
                             @XmlElement(name = "LicensePeriod", namespace = "http://www.acord.org/schema/data/draft/ReusableDataComponents/1", required = true)
                             protected LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.License.LicensePeriod licensePeriod;
                             @XmlElement(name = "StatusCode", namespace = "http://www.acord.org/schema/data/draft/ReusableDataComponents/1", required = true)
@@ -1529,16 +1529,24 @@ public class LicensingReportProcessResult {
                             /**
                              * Gets the value of the licenseNumberId property.
                              * 
+                             * @return
+                             *     possible object is
+                             *     {@link String }
+                             *     
                              */
-                            public int getLicenseNumberId() {
+                            public String getLicenseNumberId() {
                                 return licenseNumberId;
                             }
 
                             /**
                              * Sets the value of the licenseNumberId property.
                              * 
+                             * @param value
+                             *     allowed object is
+                             *     {@link String }
+                             *     
                              */
-                            public void setLicenseNumberId(int value) {
+                            public void setLicenseNumberId(String value) {
                                 this.licenseNumberId = value;
                             }
 
@@ -1750,8 +1758,8 @@ public class LicensingReportProcessResult {
                                  * 
                                  * <p>
                                  * Objects of the following type(s) are allowed in the list
-                                 * {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}
                                  * {@link String }
+                                 * {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}
                                  * 
                                  * 
                                  */
