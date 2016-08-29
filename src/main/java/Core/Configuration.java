@@ -136,13 +136,16 @@ public class Configuration {
 
     public static boolean IsAuthenticated(String aInAuthHeader) {
         if(CalenderUtils.isNullOrWhiteSpace(aInAuthHeader)) {
+            System.out.println("Auth failed because auth header is empty");
             return false;
         }
 
         if(!Objects.equals(expectedAuthHeader, new String(aInAuthHeader))) {
+            System.out.println("Auth failed because auth header " + aInAuthHeader + " is not equal to " + expectedAuthHeader);
             return false;
         }
 
+        System.out.println("Auth passsed");
         return true;
     }
 
