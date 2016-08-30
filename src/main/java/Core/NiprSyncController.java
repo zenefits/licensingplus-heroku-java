@@ -87,17 +87,25 @@ public class NiprSyncController {
     }
 
     @RequestMapping(value = "/authorize", method = RequestMethod.POST)
-    public void authorize(HttpServletRequest request, HttpServletResponse response) {
+    public void authorize(@RequestBody AuthRequest request, HttpServletResponse response) {
+        String s = request.getUsername() + ":" + request.getPassword();
+        byte[] encodedBytes = org.apache.tomcat.util.codec.binary.Base64.encodeBase64(s.getBytes());
+        String lAuthHeader = "Basic " + new String(encodedBytes);
 
-        if(isAuthorized(request, response)) {
+        if(Configuration.IsAuthenticated(lAuthHeader)) {
             response.setStatus(HttpServletResponse.SC_OK);
+        }
+        else {
+            System.out.println("Authentication Failed");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
+    /*
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-    }
+    }*/
 
     private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) {
         String lAuthHeader = request.getHeader("Authorization");

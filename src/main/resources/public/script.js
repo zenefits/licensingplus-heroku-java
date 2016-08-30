@@ -114,9 +114,11 @@ function login() {
   var request = $.ajax({
     url: "/authorize",
     type: "POST",
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader ("Authorization", "Basic " + btoa(username + ":" + password));
-    },
+    contentType: "application/json; charset=utf-8",
+    data: JSON.stringify({
+      username: username,
+      password: password
+    }),
   });
 
   request.done(function(data) {
@@ -127,7 +129,7 @@ function login() {
   });
 
   request.fail(function(jqXHR, textStatus) {
-    alert('Login Failed')
+    alert('Login Failed ')
   });
 }
 
