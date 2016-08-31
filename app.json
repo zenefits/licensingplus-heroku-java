@@ -20,7 +20,7 @@
     "SALESFORCE_CONSUMER_SECRET": "",
     "SALESFORCE_SANDBOX": "false",
     "EMAIL_ALERT_RECIPIENT": "",
-    "EMAIL_ALERT_SENDER" : "",
+    "EMAIL_ALERT_SENDER" : "support@heroku.com",
     "RESYNC_DAYS_COUNT" : "5",
     "RETRY_INTERVAL" : "36000000",
     "TZ": "America/Los_Angeles",
