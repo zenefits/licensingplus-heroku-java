@@ -1,4 +1,4 @@
-package Core.Nipr;
+package core.nipr;
 
 import nipr.*;
 import org.apache.tomcat.util.codec.binary.Base64;

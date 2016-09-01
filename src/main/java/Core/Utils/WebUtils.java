@@ -1,49 +1,26 @@
-package Core.Utils;
+package core.utils;
 
-import Core.SalesForce.LicenseResponse;
-import Core.SalesForce.OAuthResponse;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 
 /**
  * Created by vthiruvengadam on 8/9/16.
  */
 public class WebUtils {
 
-    public static <T> T getObjectFromJson(String aInData, Class<T> aInClass) {
-        T lResponse = null;
-        try {
-            ObjectMapper lMapper = new ObjectMapper();
-            lResponse = lMapper.readValue(aInData, aInClass);
-        }
-        catch(Exception ex) {
-            System.out.println("SalesForceClient: Failed to cast Oauth response");
-        }
-
-        return lResponse;
-    }
-
-    public static List<LicenseResponse> getResponseFromJson(String aInData) {
-        List<LicenseResponse> lResponse = null;
-        try {
-            ObjectMapper lMapper = new ObjectMapper();
-            lResponse = lMapper.readValue(aInData, new TypeReference<List<LicenseResponse>>(){});
-        }
-        catch(Exception ex) {
-            System.out.println("SalesForceClient: Failed to cast Oauth response");
-        }
-
-        return lResponse;
-    }
-
     public static <T> ResponseEntity<T>  postData(String aInUrl, String aInData, HttpHeaders aInHeaders, Class<T> aInType) {
 
         System.out.println("WebUtils: Posting data to " + aInUrl);
-        String lResponseData = "";
         RestTemplate lRestTemplate = new RestTemplate();
         HttpEntity<String> entity = new HttpEntity<String>(aInData,aInHeaders);
 
@@ -62,5 +39,16 @@ public class WebUtils {
     public static void appendline(String aInMsg, StringBuilder aInOutData) {
         aInOutData.append(aInMsg);
         aInOutData.append(System.getProperty("line.separator"));
+    }
+    
+    public static String convertMapToQueryString(Map<String, String> queryParameters) throws UnsupportedEncodingException {
+		StringBuilder sb = new StringBuilder();
+		  for(HashMap.Entry<String, String> e : queryParameters.entrySet()){
+		      if(sb.length() > 0){
+		          sb.append('&');
+		      }
+		      sb.append(URLEncoder.encode(e.getKey(), "UTF-8")).append('=').append(URLEncoder.encode(e.getValue(), "UTF-8"));
+		  }
+		 return sb.toString();
     }
 }

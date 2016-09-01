@@ -1,4 +1,4 @@
-package Core.Nipr;
+package core.nipr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

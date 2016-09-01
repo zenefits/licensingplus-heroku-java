@@ -1,10 +1,9 @@
-package Core.Nipr;
+package core.nipr;
 
 import java.util.*;
 
-import Core.Utils.CalenderUtils;
+import core.utils.CalenderUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Created by vthiruvengadam on 8/7/16.
