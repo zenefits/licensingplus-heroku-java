@@ -144,7 +144,7 @@ function showInfo() {
   $('#failedLicenses').empty();
   $(calendar.statusData[date].failedLicenses).each(function(index, item) {
     var groupItem = $('<li class="list-group-item"></li>');
-    $(groupItem).append('<h4 class="list-group-item-heading">' + item.licenseNumber + '</h4>');
+    $(groupItem).append('<h4 class="list-group-item-heading">' + 'License Number: ' + item.licenseNumber + ' NpnNumber: ' + item.npnNumber + ' State: ' + item.state + '</h4>');
     $(groupItem).append('<p class="list-group-item-text">' + item.lastErrorMessage + '</p>');
     $('#failedLicenses').append(groupItem);
   });
