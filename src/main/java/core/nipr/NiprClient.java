@@ -5,6 +5,7 @@ package core.nipr;
  */
 import nipr.*;
 import nipr.wsdl.*;
+import core.Configuration;
 import core.utils.*;
 
 import java.util.GregorianCalendar;
@@ -30,8 +31,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             Map<String, GregorianCalendar> aInDates,
             Map<String, LicenseInternal> aInOutLatestLicenses,
             Map<String, GregorianCalendar> aOutSuccessDates,
-            StringBuilder aInOutErrors)
-    {
+            StringBuilder aInOutErrors) {
 
         Map<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
 
@@ -50,7 +50,7 @@ public class NiprClient extends WebServiceGatewaySupport {
 
             System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS, generating CSV file");
             // Generate a CSV for it.
-            GenerateAndSendCsvFile(lFormattedDate, lCurrentDayInfo);
+            generateAndSendCsvFile(lFormattedDate, lCurrentDayInfo);
 
             // Previous Day is higher
             mergeReports(lCurrentDayInfo, aInOutLatestLicenses);
@@ -110,9 +110,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             //System.out.println("Response " + theString);
             lAllLicenses = parseReport(lType.getAlertsReport().getInputStream(), lXmlDate);
             System.out.println("Total NIPR Liceses for " + formatted + " are " + lAllLicenses.size());
-        }
-        catch (SoapFaultClientException e)
-        {
+        } catch (SoapFaultClientException e)  {
             aOutFailure.set(true);
             try {
                 PdbAlertsFaultType lFaultType = getDetailedFault(e);
@@ -123,16 +121,13 @@ public class NiprClient extends WebServiceGatewaySupport {
                         System.out.println("Treating no Nipr alerts for the day " + formatted + " as SUCCESS ++++++++++");
                     }
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 aOutFailure.set(true);
                 String lMsg = "NiprSoapApi SoapFaultClientException error in parsing the exception " + ex.getMessage();
                 WebUtils.appendline(lMsg, aInOutErrors);
                 System.out.println(lMsg);
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             aOutFailure.set(true);
             e.printStackTrace();
             String lMsg = "NiprSoapApi generic exception  " + e.getMessage();
@@ -338,8 +333,9 @@ public class NiprClient extends WebServiceGatewaySupport {
         return lPersonNumberByKey;
     }
 
-    private boolean GenerateAndSendCsvFile(String aInDate, Map<String, LicenseInternal> aInLicenses) {
-        String csvFile = "/tmp/" + aInDate + ".csv";
+    private boolean generateAndSendCsvFile(String aInDate, Map<String, LicenseInternal> aInLicenses) {
+        String csvFile = String.format("%s%s.csv", Configuration.getCSVPath(), aInDate);
+        System.out.println("[NiprClient] - generateAndSendCsvFile - csv will be generated at - " + csvFile);
         String lSuccessFileName = csvFile + ".sent";
         File lSuccessFile = new File(lSuccessFileName);
         if(lSuccessFile.exists()) {
@@ -347,7 +343,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             return true;
         }
 
-        boolean lStatus = GenerateCsvFile(csvFile, aInLicenses);
+        boolean lStatus = NIPRCSVUtils.writeNIPRAlerts(csvFile, aInLicenses);
 
         if(lStatus) {
             // Email it
@@ -356,87 +352,10 @@ public class NiprClient extends WebServiceGatewaySupport {
             lStatus = SendGridClient.sendEmailWithAttachment(lSubject, lBody, csvFile);
             if(lStatus) {
                 // Write a file called aInDate.Sent
-                XmlToCsv.writeFile(lSuccessFileName, "Success");
+                NIPRCSVUtils.writeFile(lSuccessFileName, "Success");
             }
         }
 
         return lStatus;
     }
-
-    private boolean GenerateCsvFile(String aInFile, Map<String, LicenseInternal> aInLicenses) {
-        boolean lStatus = false;
-
-        if(new File(aInFile).isFile()) {
-            System.out.println("The csv file " + aInFile + " already exists");
-            return true;
-        }
-
-        FileWriter lWriter = null;
-        try {
-            lWriter = new FileWriter(aInFile);
-            List<String> lLine = Arrays.asList(
-                                        "NpnNumber", "State", "LicenseNumber",
-                                        "EffectiveDate", "ExpirationDate", "ClassName",
-                                        "IsResidentLicense", "IsActive", "LOAName", "IsLOAActive");
-
-            XmlToCsv.writeLine(lWriter, lLine);
-            for(LicenseInternal lLicense : aInLicenses.values()) {
-                if((lLicense.linesOfAuthority != null)
-                    && (lLicense.linesOfAuthority.size() > 0))
-                {
-                    for(LineOfAuthorityInternal loa :lLicense.linesOfAuthority) {
-
-                        lLine = Arrays.asList(
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.npnNumber) ? "":lLicense.npnNumber,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.state) ? "":lLicense.state,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.licenseNumber) ? "":lLicense.licenseNumber,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.effectiveDate) ? "":lLicense.effectiveDate,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.expirationDate) ? "":lLicense.expirationDate,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.className) ? "":lLicense.className,
-                                lLicense.isResidentLicense.toString(),
-                                lLicense.isActive.toString(),
-                                CalenderUtils.isNullOrWhiteSpace(loa.name) ? "":loa.name,
-                                loa.isActive.toString());
-
-                        XmlToCsv.writeLine(lWriter, lLine);
-                    }
-                }
-                else {
-                    lLine = Arrays.asList(
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.npnNumber) ? "":lLicense.npnNumber,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.state) ? "":lLicense.state,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.licenseNumber) ? "":lLicense.licenseNumber,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.effectiveDate) ? "":lLicense.effectiveDate,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.expirationDate) ? "":lLicense.expirationDate,
-                                CalenderUtils.isNullOrWhiteSpace(lLicense.className) ? "":lLicense.className,
-                                lLicense.isResidentLicense.toString(),
-                                lLicense.isActive.toString(),
-                                "", "");
-
-                    XmlToCsv.writeLine(lWriter, lLine);
-                }
-            }
-
-            lWriter.flush();
-            lStatus = true;
-        }
-        catch (IOException ex) {
-            System.out.println("Failed to create CSV for " + aInFile + " due to IO exception " + ex.getMessage());
-        }
-        catch(Exception ex) {
-            System.out.println("Failed to create CS for " + aInFile + " due to exception " + ex.getMessage());
-        }
-        finally {
-            if (lWriter != null) {
-                try {
-                    lWriter.close();
-                } catch (IOException ex) {
-                    // ignore ... any significant errors should already have been
-                    // reported via an IOException from the final flush.
-                }
-            }
-        }
-        return lStatus;
-    }
-
 }
