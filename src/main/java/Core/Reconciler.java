@@ -25,17 +25,17 @@ public class Reconciler extends Thread {
     static long SALES_FORCE_API_RETRY_INTERVAL = 1800000; // 30 mins
     static int SALES_FORCE_API_MAX_COUNT = 5;
 
-    SalesForceClient SfClient = null;
+    SalesforceService sfdcService = null;
 
     public void run() {
 
         System.out.println("Reconciler: Started the reconciler thread");
-        SfClient = new SalesForceClient(
-                        Configuration.isSalesforceSandbox(),
-                        Configuration.getSalesForceConsumerKey(),
-                        Configuration.getSalesForceConsumerSecret(),
+        sfdcService = new SalesforceService(
+        				Configuration.getSalesForceConsumerSecret(),
+        				Configuration.getSalesForceConsumerKey(),
                         Configuration.getSalesForceUsername(),
-                        Configuration.getSalesForcePassword());
+                        Configuration.getSalesForcePassword(),
+                        Configuration.isSalesforceSandbox());
 
         SendGridClient.initV2(
                 Configuration.getSendGridUsername(),
@@ -203,7 +203,7 @@ public class Reconciler extends Thread {
         String lMsg = "";
         System.out.println("Reconciler: Call to Post to sales force, size " + aInLicenses.size() + " retry " + aInRetry);
         try {
-            List<LicenseResponse> lLicenseResponses = SfClient.sendData(aInLicenses, true);
+            List<LicenseResponse> lLicenseResponses = sfdcService.syncNIPRLicenses(aInLicenses);
 
             // Check sales force response and record failed requests.
             for(LicenseResponse lLicenseResponse : lLicenseResponses) {
