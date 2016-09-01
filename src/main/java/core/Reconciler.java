@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.*;
 import core.utils.*;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -115,7 +114,6 @@ public class Reconciler extends Thread {
 
             System.out.println("Reconciler: Attempting a Nipr Sync for " + aInDaysToSync.size() + " days");
             // Get all information
-            AtomicBoolean lFailure = new AtomicBoolean(false);
             if(aInDaysToSync.size() > 0) {
                 aInClient.getNiprReports(aInDaysToSync, aInOutLicenses, aOutSuccessDates, lErrors);
             }

@@ -18,8 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import core.nipr.LicenseInternal;
 import core.nipr.LineOfAuthorityInternal;
 import core.sfdc.responses.OAuthResponse;
-import core.sfdc.responses.SalesforceQueryMoreResponse;
-import core.sfdc.responses.SalesforceQueryResponse;
+import core.sfdc.responses.QueryResponseWrapper;
+import core.sfdc.responses.QueryResponse;
 
 public class SalesforceRestClient {
 	
@@ -72,26 +72,26 @@ public class SalesforceRestClient {
 		return requestEntity;
 	}
 	
-	private <T> SalesforceQueryMoreResponse<T> query(String queryStr, boolean queryAll) throws Exception {
-		SalesforceQueryMoreResponse<T> response = new SalesforceQueryMoreResponse<T>();
+	private <T> QueryResponseWrapper<T> query(String queryStr, boolean queryAll) throws Exception {
+		QueryResponseWrapper<T> responseWrapper = new QueryResponseWrapper<T>();
 		if (connected) {
 			try {
 				RestTemplate restTemplate = new RestTemplate();		
 				Map<String, String> queryParameters = new HashMap<String, String>();
 				queryParameters.put("q", queryStr);		
 				String endpoint = this.instanceUrl + String.format(SALESFORCE_ENDPOINT+"/?q={q}", API_VERSION, "query");	
-				ResponseEntity<SalesforceQueryResponse<T>> responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), new ParameterizedTypeReference<SalesforceQueryResponse<T>>() {}, queryParameters);	
-				SalesforceQueryResponse<T> queryResponse = responseEntity.getBody();
-				response.addRecords(queryResponse.getRecords());
+				ResponseEntity<QueryResponse<T>> responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), new ParameterizedTypeReference<QueryResponse<T>>() {}, queryParameters);	
+				QueryResponse<T> response = responseEntity.getBody();
+				responseWrapper.addRecords(response.getRecords());
 				if (queryAll) {
-					boolean isDone = queryResponse.getDone();
+					boolean isDone = response.getDone();
 					// add support for query more
 					while (!isDone) {
-						System.out.println("[SalesforceRestClient] - query more - url " + this.instanceUrl + queryResponse.getNextRecordsUrl());
-						responseEntity = restTemplate.exchange(this.instanceUrl + queryResponse.getNextRecordsUrl(), HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), new ParameterizedTypeReference<SalesforceQueryResponse<T>>() {});
-						queryResponse = responseEntity.getBody();
-						isDone = queryResponse.getDone();			
-						response.addRecords(queryResponse.getRecords());
+						System.out.println("[SalesforceRestClient] - query more - url " + this.instanceUrl + response.getNextRecordsUrl());
+						responseEntity = restTemplate.exchange(this.instanceUrl + response.getNextRecordsUrl(), HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), new ParameterizedTypeReference<QueryResponse<T>>() {});
+						response = responseEntity.getBody();
+						isDone = response.getDone();			
+						responseWrapper.addRecords(response.getRecords());
 					}	
 				}
 			
@@ -113,7 +113,7 @@ public class SalesforceRestClient {
 			System.out.println("[SalesforceRestClient] - query - no connection to Salesforce");		
 			throw new Exception("Failed to connect to salesforce");
 		}
-		return response;
+		return responseWrapper;
 	}
 	
 	public boolean isConnected() {
@@ -149,11 +149,11 @@ public class SalesforceRestClient {
 	    return response;
 	}
 	
-	public <T> SalesforceQueryMoreResponse<T> query(String queryStr) throws Exception {
+	public <T> QueryResponseWrapper<T> query(String queryStr) throws Exception {
 		return query(queryStr, false);
 	}
 	
-	public <T> SalesforceQueryMoreResponse<T> queryAll(String queryStr) throws Exception {
+	public <T> QueryResponseWrapper<T> queryAll(String queryStr) throws Exception {
 		return query(queryStr, true);
 	}
 	

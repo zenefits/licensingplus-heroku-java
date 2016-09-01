@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SalesforceQueryMoreResponse <T> {
+public class QueryResponseWrapper <T> {
 	private List<T> records;
 	
-	public SalesforceQueryMoreResponse() {
+	public QueryResponseWrapper() {
 		this.records = new ArrayList<T>();
 	}
 	

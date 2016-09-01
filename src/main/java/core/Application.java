@@ -2,7 +2,6 @@ package core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class Application {
@@ -12,7 +11,7 @@ public class Application {
         // Read ENV Variables
         Configuration.LoadParams();
 
-        ApplicationContext ctx = SpringApplication.run(Application.class, args);
+        SpringApplication.run(Application.class, args);
 
         System.out.println("Launching the reconciler thread");
 

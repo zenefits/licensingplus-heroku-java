@@ -78,31 +78,4 @@ public class NIPRSyncedLicenseResponse {
 				+ attributes + ", LicensingPlus__State__c = " + LicensingPlus__State__c
 				+ ", LicensingPlus__Effective_Date__c = " + LicensingPlus__Effective_Date__c + "]";
 	}
-	
-	public static class Attributes {
-		private String type;
-
-		private String url;
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public String getUrl() {
-			return url;
-		}
-
-		public void setUrl(String url) {
-			this.url = url;
-		}
-
-		@Override
-		public String toString() {
-			return "ClassPojo [type = " + type + ", url = " + url + "]";
-		}
-	}
 }
