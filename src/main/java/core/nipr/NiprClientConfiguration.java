@@ -1,15 +1,8 @@
 package core.nipr;
 
-import nipr.*;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.xml.transform.*;
-import org.springframework.ws.transport.http.HttpUrlConnectionMessageSender;
 import org.springframework.ws.client.core.WebServiceTemplate;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 
 public class NiprClientConfiguration {
 

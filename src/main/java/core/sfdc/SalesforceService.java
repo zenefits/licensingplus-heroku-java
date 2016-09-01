@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.nipr.LicenseInternal;
 import core.sfdc.responses.LicenseResponse;
 import core.sfdc.responses.NIPRSyncedLicenseResponse;
-import core.sfdc.responses.SalesforceQueryMoreResponse;
+import core.sfdc.responses.QueryResponseWrapper;
 
 /**
  * Created by vthiruvengadam on 8/9/16.
@@ -28,7 +28,7 @@ public class SalesforceService {
     	String queryStr = "SELECT licensingplus__nipr_update_date__c, licensingplus__npn_number_formula__c, licensingplus__state__c, licensingplus__effective_date__c, licensingplus__number__c "
 				+ "FROM licensingplus__License__c "
 				+ "WHERE licensingplus__nipr_update_date__c=" + date;
-    	SalesforceQueryMoreResponse<NIPRSyncedLicenseResponse> response = this.restClient.queryAll(queryStr);
+    	QueryResponseWrapper<NIPRSyncedLicenseResponse> response = this.restClient.queryAll(queryStr);
 				
     	List<NIPRSyncedLicenseResponse> records = response.getRecords();
     	return records;
