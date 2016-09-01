@@ -88,44 +88,4 @@ public class NIPRCSVUtils {
         }
         return lStatus;
     }
-	
-	public static void main(String[] args) {
-		LicenseInternal li = new LicenseInternal();
-		li.className = "NON RESIDENT PRODUCER";
-		li.effectiveDate = "2016-8-24";
-		li.expirationDate = "2019-4-30";
-		li.isResidentLicense = false;
-		li.isActive = true;
-		li.licenseNumber = "002521388";
-		li.state = "HI";
-		li.npnNumber = "17359172";
-		li.niprUpdateDate = "2016-08-21";
-		LineOfAuthorityInternal loa1 = new LineOfAuthorityInternal();
-		loa1.isActive = true;
-		loa1.name = "Life";
-		
-		LineOfAuthorityInternal loa = new LineOfAuthorityInternal();
-		loa.isActive = true;
-		loa.name = "DISABILITY (HEALTH),Test1234";
-		
-		li.linesOfAuthority.add(loa);
-		li.linesOfAuthority.add(loa1);
-		
-		LicenseInternal li1 = new LicenseInternal();
-		li1.className = "NON RESIDENT PRODUCER";
-		li1.effectiveDate = "2016-8-24";
-		li1.expirationDate = "2019-4-30";
-		li1.isResidentLicense = false;
-		li1.isActive = true;
-		li1.licenseNumber = "002521388";
-		li1.state = "HI";
-		li1.npnNumber = "1735";
-		li1.niprUpdateDate = "2016-08-22";
-		
-		Map<String, LicenseInternal> licenses = new HashMap<String, LicenseInternal>();
-		licenses.put("1", li);
-		licenses.put("2", li1);
-		
-		System.out.println(NIPRCSVUtils.writeNIPRAlerts("test.csv", licenses));
-	}
 }
