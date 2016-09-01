@@ -227,7 +227,7 @@ public class CalenderUtils {
         return aInCode;
     }
 
-    public static HashMap<String, GregorianCalendar> getLastNDays(int aInN) {
+    public static Map<String, GregorianCalendar> getLastNDays(int aInN) {
 
         HashMap<String, GregorianCalendar> lDays = new HashMap<String, GregorianCalendar>();
         GregorianCalendar lCal = (GregorianCalendar) GregorianCalendar.getInstance();

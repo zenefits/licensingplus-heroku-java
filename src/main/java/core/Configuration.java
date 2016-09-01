@@ -224,6 +224,11 @@ public class Configuration {
     public static int getResyncDaysCount() {
         return resyncDaysCount;
     }
+    
+    // change this path if you want to test it locally
+    public static String getCSVPath() {
+    	return "/tmp/";
+    }
 
     private static void throwIfEmpty(String aInDataField, String aInData) {
 
