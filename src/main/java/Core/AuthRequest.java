@@ -1,10 +1,6 @@
-package Core;
+package core;
 
-import java.util.*;
-
-import Core.Utils.CalenderUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Created by vthiruvengadam on 8/7/16.

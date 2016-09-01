@@ -1,18 +1,17 @@
-package Core.Nipr;
+package core.nipr;
 
 /**
  * Created by vthiruvengadam on 8/5/16.
  */
 import nipr.*;
 import nipr.wsdl.*;
-import Core.Utils.*;
+import core.utils.*;
 
 import java.util.GregorianCalendar;
 import java.util.*;
 import javax.activation.DataHandler;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.datatype.DatatypeFactory;
-import java.lang.*;
 import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 

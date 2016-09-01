@@ -1,11 +1,9 @@
-package Core;
+package core;
 
-import Core.Nipr.LicenseInternal;
-import Core.Nipr.NiprSyncStatus;
-import Core.Utils.CalenderUtils;
+import core.nipr.LicenseInternal;
+import core.nipr.NiprSyncStatus;
+import core.utils.CalenderUtils;
 
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;

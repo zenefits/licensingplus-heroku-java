@@ -1,17 +1,16 @@
-package Core;
+package core;
 
-import Core.Nipr.*;
-import Core.SalesForce.*;
-import java.text.SimpleDateFormat;
+import core.nipr.*;
+import core.sfdc.*;
+import core.sfdc.responses.LicenseResponse;
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.*;
-import java.util.Calendar;
-import Core.Utils.*;
+import core.utils.*;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 

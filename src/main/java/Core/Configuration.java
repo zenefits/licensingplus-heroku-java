@@ -1,6 +1,6 @@
-package Core;
+package core;
 
-import Core.Utils.CalenderUtils;
+import core.utils.CalenderUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 import java.util.Objects;

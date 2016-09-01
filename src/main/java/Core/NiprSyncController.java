@@ -1,8 +1,7 @@
-package Core;
+package core;
 
-import Core.Nipr.LicenseInternal;
-import Core.Nipr.NiprSyncStatus;
-import Core.Utils.CalenderUtils;
+import core.nipr.LicenseInternal;
+import core.nipr.NiprSyncStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;

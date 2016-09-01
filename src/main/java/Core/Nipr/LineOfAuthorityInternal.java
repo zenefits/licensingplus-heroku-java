@@ -1,4 +1,4 @@
-package Core.Nipr;
+package core.nipr;
 
 /**
  * Created by vthiruvengadam on 8/7/16.
