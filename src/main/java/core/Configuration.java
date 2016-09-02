@@ -61,6 +61,9 @@ public class Configuration {
     private static final String resyncDaysCountField = "RESYNC_DAYS_COUNT";
     private static int resyncDaysCount;
 
+    private static final String pauseSyncField = "PAUSE_SYNC";
+    private static boolean pauseSync;
+
     private static final int defaultResyncDaysCount = 5;
     private static final int maxResyncDaysCount = 14;
 
@@ -132,6 +135,9 @@ public class Configuration {
                 resyncDaysCount = defaultResyncDaysCount;
             }
         }
+
+        String lPause = System.getenv(pauseSyncField);
+        pauseSync = Boolean.parseBoolean(lPause);
     }
 
     public static boolean IsAuthenticated(String aInAuthHeader) {
@@ -224,7 +230,11 @@ public class Configuration {
     public static int getResyncDaysCount() {
         return resyncDaysCount;
     }
-    
+
+    public static boolean isPauseSync() {
+        return pauseSync;
+    }
+
     // change this path if you want to test it locally
     public static String getCSVPath() {
     	return "/tmp/";

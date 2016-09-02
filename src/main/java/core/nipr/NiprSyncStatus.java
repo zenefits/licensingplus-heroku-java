@@ -1,7 +1,9 @@
 package core.nipr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import core.sfdc.responses.NIPRSyncedLicenseResponse;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,12 @@ public class NiprSyncStatus {
 
     private List<LicenseInternal>  failedLicenses;
 
+    private List<NIPRSyncedLicenseResponse> syncedLicenses;
+
     public NiprSyncStatus() {
+
         failedLicenses = new ArrayList<LicenseInternal>();
+        syncedLicenses = new ArrayList<NIPRSyncedLicenseResponse>();
     }
 
     public String getSyncDate() {
@@ -37,6 +43,14 @@ public class NiprSyncStatus {
 
     public List<LicenseInternal> getFailedLicenses() {
         return failedLicenses;
+    }
+
+    public List<NIPRSyncedLicenseResponse> getSyncedLicenses() {
+        return syncedLicenses;
+    }
+
+    public void setSyncedLicenses(List<NIPRSyncedLicenseResponse> syncedLicenses) {
+        this.syncedLicenses = syncedLicenses;
     }
 
     public void setSyncDate(String syncDate) {
