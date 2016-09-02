@@ -219,10 +219,14 @@ Calendar.prototype.generateHTML = function(){
       var data = this.statusData[key];
       var status = true;
       var errorCount = 0;
+      var successCount = 0;
       var hasData = (data!==undefined);
       if (hasData) {
         status = data.status;
         errorCount = data.failedLicenses.length;
+        if(data.syncedLicenses != null) {
+          successCount = data.syncedLicenses.length;
+        }
       }
       var cssClass = 'calendar-day ';
       cssClass += (!hasData?'no-data ':'has-data ');
@@ -235,7 +239,7 @@ Calendar.prototype.generateHTML = function(){
         html += '<div class="date-label">'+day+'</div>';
         html += '<div class="error-count">';
         if(errorCount > 0) {
-          html += errorCount + ' ERRORS';
+          html += successCount + " Success <br>" + errorCount + ' Errors';
         } else {
           html += '&nbsp;';
         }
