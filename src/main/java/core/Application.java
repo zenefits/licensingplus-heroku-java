@@ -16,7 +16,7 @@ public class Application {
         System.out.println("Launching the reconciler thread");
 
         Reconciler lReconciler = new Reconciler();
-        LicenseDB.setReconcilerThread(lReconciler);
+        LicenseDB.setReconciler(lReconciler);
         lReconciler.start();
     }
 
