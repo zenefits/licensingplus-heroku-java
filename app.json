@@ -22,6 +22,7 @@
     "EMAIL_ALERT_RECIPIENT": "",
     "EMAIL_ALERT_SENDER" : "support@heroku.com",
     "RESYNC_DAYS_COUNT" : "5",
+    "PAUSE_SYNC" : "true",
     "RETRY_INTERVAL" : "36000000",
     "TZ": "America/Los_Angeles",
     "JAVA_TOOL_OPTIONS": "-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+UseConcMarkSweepGC"
