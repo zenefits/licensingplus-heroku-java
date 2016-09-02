@@ -2,6 +2,7 @@ package core;
 
 import core.nipr.LicenseInternal;
 import core.nipr.NiprSyncStatus;
+import core.sfdc.responses.NIPRSyncedLicenseResponse;
 import core.utils.CalenderUtils;
 
 import java.util.*;
@@ -22,14 +23,14 @@ public class LicenseDB {
     private static HashSet<String> completedNiprSyncDates = new HashSet<String>();
     private static GregorianCalendar lastSuccessfullSync = null;
     private static UUID resyncTriggerId = UUID.randomUUID();
-    private static Thread reconcilerThread = null;
+    private static Reconciler reconciler = null;
 
     static  {
         pendingNiprSyncDates = CalenderUtils.getLastNDays(Configuration.GetResyncDaysCount());
     }
 
-    public static void setReconcilerThread(Thread aInThread) {
-        reconcilerThread = aInThread;
+    public static void setReconciler(Reconciler aInReconciler) {
+        reconciler = aInReconciler;
     }
 
     public static UUID getResyncTriggerId() {
@@ -54,7 +55,7 @@ public class LicenseDB {
             writeLock.unlock();
         }
 
-        reconcilerThread.interrupt();
+        reconciler.interrupt();
     }
 
     public static Map<String, GregorianCalendar> getPendingNiprSyncDates() {
@@ -218,6 +219,18 @@ public class LicenseDB {
     public static Map<String, NiprSyncStatus> getCurrentStatus() {
 
         Map<String, NiprSyncStatus> lCurrentStatuses = new HashMap<String, NiprSyncStatus>();
+        Map<String, List<NIPRSyncedLicenseResponse>> lSuccessLicensesMap = new HashMap<String, List<NIPRSyncedLicenseResponse>>();
+        // Get the success syncs from sfdc
+        for(String lCompleteDate : completedNiprSyncDates) {
+
+            try {
+                List<NIPRSyncedLicenseResponse> lSuccessResponses = reconciler.getNIPRSyncedLicenseResponseByDate(lCompleteDate);
+                lSuccessLicensesMap.put(lCompleteDate, lSuccessResponses);
+            }
+            catch(Exception ex) {
+                System.out.println("GetStatus: Failed to get the successful licenses for " + lCompleteDate);
+            }
+        }
 
         readLock.lock();
         try{
@@ -230,6 +243,9 @@ public class LicenseDB {
                 }
                 lStatus.setSyncDate(lXmlDate);
                 lStatus.setStatus(true);
+                if(lSuccessLicensesMap.containsKey(lCompleteDate)) {
+                    lStatus.setSyncedLicenses(lSuccessLicensesMap.get(lCompleteDate));
+                }
                 lCurrentStatuses.put(lXmlDate, lStatus);
             }
 

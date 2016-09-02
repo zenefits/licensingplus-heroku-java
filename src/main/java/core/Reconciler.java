@@ -9,6 +9,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.*;
+
+import core.sfdc.responses.NIPRSyncedLicenseResponse;
 import core.utils.*;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,6 +53,16 @@ public class Reconciler extends Thread {
         UUID lResyncTriggerId = LicenseDB.getResyncTriggerId();
         while(true) {
 
+            if(Configuration.isPauseSync()) {
+                System.out.println("System has been paused");
+                try {
+                    Thread.sleep(36000000);
+                }
+                catch (Exception ex) {
+
+                }
+                continue;
+            }
             try
             {
                 lRetryInterval = new AtomicLong(Configuration.getReconcilerRetry());
@@ -253,6 +265,10 @@ public class Reconciler extends Thread {
                 }
             }
         }
+    }
+
+    public List<NIPRSyncedLicenseResponse> getNIPRSyncedLicenseResponseByDate(String aInDate) throws Exception {
+        return this.sfdcService.getNIPRSyncedLicenseResponseByDate(aInDate);
     }
 
     private List<LicenseInternal>  GetOrderLicenses(Map<String, LicenseInternal> aInLicenses) {
