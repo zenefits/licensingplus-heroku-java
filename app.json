@@ -11,6 +11,8 @@
   "repository": "https://github.com/zenefits/licensingplus-heroku-java",
   "success_url": "/",
   "env": {
+    "USERNAME": "",
+    "PASSWORD": "",
     "NIPR_ALERT_ENDPOINT": "https://pdb-services.nipr.com/pdb-alerts-industry-services/services/industry-ws",
     "NIPR_USERNAME": "",
     "NIPR_PASSWORD": "",
