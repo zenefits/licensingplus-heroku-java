@@ -101,7 +101,7 @@ public class NiprSyncController {
     }
     
     @RequestMapping(value = "/ping", method = RequestMethod.GET)
-    public void ping(@RequestBody AuthRequest request, HttpServletResponse response) {
+    public void ping(HttpServletRequest request, HttpServletResponse response) {
     	System.out.println("Licensing+ app is running.");
     	response.setStatus(HttpServletResponse.SC_OK);
     }
