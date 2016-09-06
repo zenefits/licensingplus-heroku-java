@@ -100,10 +100,13 @@ public class NiprSyncController {
         }
     }
     
-//    @ModelAttribute
-//    public void setResponseHeader(HttpServletResponse response) {
-//        response.setHeader("Access-Control-Allow-Origin", "*");
-//    }
+    @RequestMapping(value = "/ping", method = RequestMethod.GET)
+    public void ping(@RequestBody AuthRequest request, HttpServletResponse response) {}
+    
+    @ModelAttribute
+    public void setResponseHeader(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+    }
 
     private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) {
         String lAuthHeader = request.getHeader("Authorization");
