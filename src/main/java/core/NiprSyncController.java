@@ -99,12 +99,11 @@ public class NiprSyncController {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
-
-    /*
+    
     @ModelAttribute
     public void setResponseHeader(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-    }*/
+    }
 
     private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) {
         String lAuthHeader = request.getHeader("Authorization");
