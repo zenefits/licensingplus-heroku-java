@@ -100,15 +100,11 @@ public class NiprSyncController {
         }
     }
     
+    @CrossOrigin
     @RequestMapping(value = "/ping", method = RequestMethod.GET)
     public void ping(HttpServletRequest request, HttpServletResponse response) {
     	System.out.println("Licensing+ app is running.");
     	response.setStatus(HttpServletResponse.SC_OK);
-    }
-    
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
     }
 
     private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) {
