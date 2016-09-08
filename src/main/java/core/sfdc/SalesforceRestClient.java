@@ -3,7 +3,6 @@ package core.sfdc;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,6 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core.sfdc.responses.OAuthResponse;
 import core.sfdc.responses.QueryResponseWrapper;
@@ -68,7 +70,7 @@ public class SalesforceRestClient {
 		return requestEntity;
 	}
 	
-	private <T> QueryResponseWrapper<T> query(String queryStr, boolean queryAll) throws Exception {
+	private <T> QueryResponseWrapper<T> query(String queryStr, boolean queryAll, Class<T> responseType) throws Exception {
 		QueryResponseWrapper<T> responseWrapper = new QueryResponseWrapper<T>();
 		if (connected) {
 			try {
@@ -76,26 +78,31 @@ public class SalesforceRestClient {
 				Map<String, String> queryParameters = new HashMap<String, String>();
 				queryParameters.put("q", queryStr);		
 				String endpoint = this.instanceUrl + String.format(SALESFORCE_ENDPOINT+"/?q={q}", API_VERSION, "query");	
-				ResponseEntity<QueryResponse<T>> responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), new ParameterizedTypeReference<QueryResponse<T>>() {}, queryParameters);	
-				QueryResponse<T> response = responseEntity.getBody();
-				responseWrapper.addRecords(response.getRecords());
-				if (queryAll) {
-					boolean isDone = response.getDone();
-					// add support for query more
-					while (!isDone) {
-						System.out.println("[SalesforceRestClient] - query more - url " + this.instanceUrl + response.getNextRecordsUrl());
-						responseEntity = restTemplate.exchange(this.instanceUrl + response.getNextRecordsUrl(), HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), new ParameterizedTypeReference<QueryResponse<T>>() {});
-						response = responseEntity.getBody();
-						isDone = response.getDone();			
-						responseWrapper.addRecords(response.getRecords());
-					}	
-				}
-			
+				ResponseEntity<String> responseEntity = restTemplate.exchange(endpoint, HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), String.class, queryParameters);	
+		        ObjectMapper mapper = new ObjectMapper();
+		        JavaType responseJavaType = mapper.getTypeFactory().constructParametrizedType(QueryResponse.class, QueryResponse.class, responseType);
+		        String body = responseEntity.getBody();
+		        if (body!=null) {
+		        	QueryResponse<T> response = mapper.readValue(body, responseJavaType);
+					responseWrapper.addRecords(response.getRecords());
+					if (queryAll) {
+						boolean isDone = response.getDone();
+						// add support for query more
+						while (!isDone) {
+							System.out.println("[SalesforceRestClient] - query more - url " + this.instanceUrl + response.getNextRecordsUrl());
+							responseEntity = restTemplate.exchange(this.instanceUrl + response.getNextRecordsUrl(), HttpMethod.GET, getRequestEntity(null, MediaType.APPLICATION_FORM_URLENCODED), String.class);
+							body = responseEntity.getBody();
+					        response = mapper.readValue(body, responseJavaType);
+							isDone = response.getDone();			
+							responseWrapper.addRecords(response.getRecords());
+						}	
+					}
+		        }		        
 			} catch (HttpClientErrorException httpException) {
 	            if(httpException.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 	                System.out.println("[SalesforceService] - query - session expired retry connect - \n " + httpException.getResponseBodyAsString());
 	                connect();
-	                query(queryStr, queryAll);
+	                query(queryStr, queryAll, responseType);
 	            } else {
 	            	System.out.println("[SalesforceRestClient] - query - request failed during calling salesforce - " + httpException.getResponseBodyAsString());
 	    			throw httpException;
@@ -145,11 +152,11 @@ public class SalesforceRestClient {
 	    return response;
 	}
 	
-	public <T> QueryResponseWrapper<T> query(String queryStr) throws Exception {
-		return query(queryStr, false);
+	public <T> QueryResponseWrapper<T> query(String queryStr, Class<T> responseType) throws Exception {
+		return query(queryStr, false, responseType);
 	}
 	
-	public <T> QueryResponseWrapper<T> queryAll(String queryStr) throws Exception {
-		return query(queryStr, true);
+	public <T> QueryResponseWrapper<T> queryAll(String queryStr, Class<T> responseType) throws Exception {
+		return query(queryStr, true, responseType);
 	}
 }

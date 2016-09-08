@@ -30,8 +30,8 @@ public class SalesforceService {
     public List<NIPRSyncedLicenseCountResponse> getNIPRSyncedLicenseCountResponse(int days) throws Exception {
         String queryStr = "SELECT licensingplus__nipr_update_date__c, count(id) FROM licensingplus__License__c WHERE licensingplus__nipr_update_date__c = LAST_N_DAYS:" + days +
        					"GROUP BY licensingplus__nipr_update_date__c ORDER BY licensingplus__nipr_update_date__c DESC";
-        QueryResponseWrapper<NIPRSyncedLicenseCountResponse> response = this.restClient.queryAll(queryStr);
-
+        QueryResponseWrapper<NIPRSyncedLicenseCountResponse> response = this.restClient.queryAll(queryStr, NIPRSyncedLicenseCountResponse.class);
+       
         List<NIPRSyncedLicenseCountResponse> records = response.getRecords();
         return records;
     }
@@ -40,7 +40,7 @@ public class SalesforceService {
     	String queryStr = "SELECT licensingplus__nipr_update_date__c, licensingplus__npn_number_formula__c, licensingplus__state__c, licensingplus__effective_date__c, licensingplus__number__c "
 				+ "FROM licensingplus__License__c "
 				+ "WHERE licensingplus__nipr_update_date__c=" + date;
-    	QueryResponseWrapper<NIPRSyncedLicenseResponse> response = this.restClient.queryAll(queryStr);
+    	QueryResponseWrapper<NIPRSyncedLicenseResponse> response = this.restClient.queryAll(queryStr, NIPRSyncedLicenseResponse.class);
 				
     	List<NIPRSyncedLicenseResponse> records = response.getRecords();
     	return records;

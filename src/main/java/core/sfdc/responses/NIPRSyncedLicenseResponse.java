@@ -1,6 +1,7 @@
 package core.sfdc.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -9,41 +10,45 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NIPRSyncedLicenseResponse {
+	@JsonProperty("LicensingPlus__Number__c")
+	private String number;
 	
-	private String LicensingPlus__Number__c;
-
-	private String LicensingPlus__NPN_Number_Formula__c;
-
-	private String LicensingPlus__NIPR_Update_Date__c;
+	@JsonProperty("LicensingPlus__NPN_Number_Formula__c")
+	private String npnNumberFormula;
+	
+	@JsonProperty("LicensingPlus__NIPR_Update_Date__c")
+	private String updateDate;
 
 	private Attributes attributes;
+	
+	@JsonProperty("LicensingPlus__State__c")
+	private String state;
 
-	private String LicensingPlus__State__c;
+	@JsonProperty("LicensingPlus__Effective_Date__c")
+	private String effectiveDate;
 
-	private String LicensingPlus__Effective_Date__c;
-
-	public String getLicensingPlus__Number__c() {
-		return LicensingPlus__Number__c;
+	public String getNumber() {
+		return number;
 	}
 
-	public void setLicensingPlus__Number__c(String LicensingPlus__Number__c) {
-		this.LicensingPlus__Number__c = LicensingPlus__Number__c;
+	public void setNumber(String number) {
+		this.number = number;
 	}
 
-	public String getLicensingPlus__NPN_Number_Formula__c() {
-		return LicensingPlus__NPN_Number_Formula__c;
+	public String getNpnNumberFormula() {
+		return npnNumberFormula;
 	}
 
-	public void setLicensingPlus__NPN_Number_Formula__c(String LicensingPlus__NPN_Number_Formula__c) {
-		this.LicensingPlus__NPN_Number_Formula__c = LicensingPlus__NPN_Number_Formula__c;
+	public void setNpnNumberFormula(String npnNumberFormula) {
+		this.npnNumberFormula = npnNumberFormula;
 	}
 
-	public String getLicensingPlus__NIPR_Update_Date__c() {
-		return LicensingPlus__NIPR_Update_Date__c;
+	public String getUpdateDate() {
+		return updateDate;
 	}
 
-	public void setLicensingPlus__NIPR_Update_Date__c(String LicensingPlus__NIPR_Update_Date__c) {
-		this.LicensingPlus__NIPR_Update_Date__c = LicensingPlus__NIPR_Update_Date__c;
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public Attributes getAttributes() {
@@ -54,28 +59,28 @@ public class NIPRSyncedLicenseResponse {
 		this.attributes = attributes;
 	}
 
-	public String getLicensingPlus__State__c() {
-		return LicensingPlus__State__c;
+	public String getState() {
+		return state;
 	}
 
-	public void setLicensingPlus__State__c(String LicensingPlus__State__c) {
-		this.LicensingPlus__State__c = LicensingPlus__State__c;
+	public void setState(String state) {
+		this.state = state;
 	}
 
-	public String getLicensingPlus__Effective_Date__c() {
-		return LicensingPlus__Effective_Date__c;
+	public String getEffectiveDate() {
+		return effectiveDate;
 	}
 
-	public void setLicensingPlus__Effective_Date__c(String LicensingPlus__Effective_Date__c) {
-		this.LicensingPlus__Effective_Date__c = LicensingPlus__Effective_Date__c;
+	public void setEffectiveDate(String effectiveDate) {
+		this.effectiveDate = effectiveDate;
 	}
 
 	@Override
 	public String toString() {
-		return "ClassPojo [LicensingPlus__Number__c = " + LicensingPlus__Number__c
-				+ ", LicensingPlus__NPN_Number_Formula__c = " + LicensingPlus__NPN_Number_Formula__c
-				+ ", LicensingPlus__NIPR_Update_Date__c = " + LicensingPlus__NIPR_Update_Date__c + ", attributes = "
-				+ attributes + ", LicensingPlus__State__c = " + LicensingPlus__State__c
-				+ ", LicensingPlus__Effective_Date__c = " + LicensingPlus__Effective_Date__c + "]";
+		return "ClassPojo [number = " + number
+				+ ", npnNumberFormula = " + npnNumberFormula
+				+ ", updateDate = " + updateDate + ", attributes = "
+				+ attributes + ", state = " + state
+				+ ", effectiveDate = " + effectiveDate + "]";
 	}
 }
