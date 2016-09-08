@@ -1,8 +1,6 @@
 package core.sfdc;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -15,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import core.nipr.LicenseInternal;
-import core.nipr.LineOfAuthorityInternal;
 import core.sfdc.responses.OAuthResponse;
 import core.sfdc.responses.QueryResponseWrapper;
 import core.sfdc.responses.QueryResponse;
@@ -101,7 +97,7 @@ public class SalesforceRestClient {
 	                connect();
 	                query(queryStr, queryAll);
 	            } else {
-	            	System.out.println("[SalesforceRestClient] - query - request failed during calling salesforce - " + httpException);
+	            	System.out.println("[SalesforceRestClient] - query - request failed during calling salesforce - " + httpException.getResponseBodyAsString());
 	    			throw httpException;
 	            }
 	        } catch(Exception e) {
@@ -134,7 +130,7 @@ public class SalesforceRestClient {
 	                connect();
 	                apexRest(endpoint, method, requestBody, responseType);
 	            } else {
-	            	System.out.println("[SalesforceRestClient] - apexRest - request failed during calling salesforce - " + httpException);
+	            	System.out.println("[SalesforceRestClient] - apexRest - request failed during calling salesforce - " + httpException.getResponseBodyAsString());
 	    			throw httpException;
 	            }
 	        } catch(Exception e) {
@@ -156,41 +152,4 @@ public class SalesforceRestClient {
 	public <T> QueryResponseWrapper<T> queryAll(String queryStr) throws Exception {
 		return query(queryStr, true);
 	}
-	
-	/*public static void main(String[] args) throws Exception {
-		String CLIENT_SECRET = "4806881495182352292";
-		String CLIENT_KEY = "3MVG9Iu66FKeHhIPe91yESdsJLzsN5yIdlhgFG5.LbjqpVh3K4u280w.7IfqYXNONSvBQAaDL2vAe7aY8D5pE";
-		String USERNAME = "niprbot@zenefits.com.qa";
-		String PASSWORD = "Zenefits1234!";
-		boolean IS_SANDBOX = true;		
-
-		SalesforceService sfdcService = new SalesforceService(CLIENT_SECRET, CLIENT_KEY, USERNAME, PASSWORD, IS_SANDBOX);
-		
-		LicenseInternal li = new LicenseInternal();
-		li.className = "NON RESIDENT PRODUCER";
-		li.effectiveDate = "2016-8-24";
-		li.expirationDate = "2019-4-30";
-		li.isResidentLicense = false;
-		li.isActive = true;
-		li.licenseNumber = "002521388";
-		li.state = "HI";
-		li.npnNumber = "17359172";
-		li.niprUpdateDate = "2016-08-21";
-		LineOfAuthorityInternal loa1 = new LineOfAuthorityInternal();
-		loa1.isActive = true;
-		loa1.name = "Life";
-		
-		LineOfAuthorityInternal loa = new LineOfAuthorityInternal();
-		loa.isActive = true;
-		loa.name = "DISABILITY (HEALTH)";
-		
-		li.linesOfAuthority.add(loa);
-		li.linesOfAuthority.add(loa1);
-		
-		List<LicenseInternal> licenses = Arrays.asList(li);
-				
-		System.out.println(sfdcService.getNIPRSyncedLicenseResponseByDate("2016-08-31"));
-		
-		//System.out.println(sfdcService.syncNIPRLicenses(licenses));
-	}*/
 }

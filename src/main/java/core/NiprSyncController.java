@@ -96,21 +96,22 @@ public class NiprSyncController {
         }
         else {
             System.out.println("Authentication Failed");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
-
-    /*
-    @ModelAttribute
-    public void setResponseHeader(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-    }*/
+    
+    @CrossOrigin
+    @RequestMapping(value = "/ping", method = RequestMethod.GET)
+    public void ping(HttpServletRequest request, HttpServletResponse response) {
+    	System.out.println("Licensing+ app is running.");
+    	response.setStatus(HttpServletResponse.SC_OK);
+    }
 
     private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) {
         String lAuthHeader = request.getHeader("Authorization");
         if(!Configuration.IsAuthenticated(lAuthHeader)) {
             System.out.println("Authentication Failed");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
 

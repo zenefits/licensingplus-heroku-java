@@ -9,11 +9,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core.nipr.LicenseInternal;
 import core.sfdc.responses.LicenseResponse;
+import core.sfdc.responses.NIPRSyncedLicenseCountResponse;
 import core.sfdc.responses.NIPRSyncedLicenseResponse;
 import core.sfdc.responses.QueryResponseWrapper;
 
 /**
- * Created by vthiruvengadam on 8/9/16.
+ *
+ * @author shuchun.yang
+ *
  */
 public class SalesforceService {
 	
@@ -24,7 +27,16 @@ public class SalesforceService {
     	this.restClient = new SalesforceRestClient(clientSecret, clientKey, username, password, isSandbox);
     }
     
-    public List<NIPRSyncedLicenseResponse> getNIPRSyncedLicenseResponseByDate(String date) throws Exception {    	
+    public List<NIPRSyncedLicenseCountResponse> getNIPRSyncedLicenseCountResponse(int days) throws Exception {
+        String queryStr = "SELECT licensingplus__nipr_update_date__c, count(id) FROM licensingplus__License__c WHERE licensingplus__nipr_update_date__c = LAST_N_DAYS:" + days +
+       					"GROUP BY licensingplus__nipr_update_date__c ORDER BY licensingplus__nipr_update_date__c DESC";
+        QueryResponseWrapper<NIPRSyncedLicenseCountResponse> response = this.restClient.queryAll(queryStr);
+
+        List<NIPRSyncedLicenseCountResponse> records = response.getRecords();
+        return records;
+    }
+    
+    public List<NIPRSyncedLicenseResponse> getNIPRSyncedLicenseResponseByDate(String date) throws Exception {
     	String queryStr = "SELECT licensingplus__nipr_update_date__c, licensingplus__npn_number_formula__c, licensingplus__state__c, licensingplus__effective_date__c, licensingplus__number__c "
 				+ "FROM licensingplus__License__c "
 				+ "WHERE licensingplus__nipr_update_date__c=" + date;
