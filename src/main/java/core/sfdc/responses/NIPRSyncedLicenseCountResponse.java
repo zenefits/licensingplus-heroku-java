@@ -1,12 +1,14 @@
 package core.sfdc.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NIPRSyncedLicenseCountResponse {
 	private int expr0;
-
-	private String NIPR_Update_Date__c;
+	
+	@JsonProperty("LicensingPlus__NIPR_Update_Date__c")
+	private String updateDate;
 
 	private Attributes attributes;
 
@@ -18,12 +20,12 @@ public class NIPRSyncedLicenseCountResponse {
 		this.expr0 = expr0;
 	}
 
-	public String getNIPR_Update_Date__c() {
-		return NIPR_Update_Date__c;
+	public String getUpdateDate() {
+		return updateDate;
 	}
 
-	public void setNIPR_Update_Date__c(String NIPR_Update_Date__c) {
-		this.NIPR_Update_Date__c = NIPR_Update_Date__c;
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public Attributes getAttributes() {
@@ -36,7 +38,7 @@ public class NIPRSyncedLicenseCountResponse {
 
 	@Override
 	public String toString() {
-		return "ClassPojo [expr0 = " + expr0 + ", NIPR_Update_Date__c = " + NIPR_Update_Date__c + ", attributes = "
+		return "ClassPojo [expr0 = " + expr0 + ", updateDate = " + updateDate + ", attributes = "
 				+ attributes + "]";
 	}
 }
