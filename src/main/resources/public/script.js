@@ -224,9 +224,7 @@ Calendar.prototype.generateHTML = function(){
       if (hasData) {
         status = data.status;
         errorCount = data.failedLicenses.length;
-        if(data.syncedLicenses != null) {
-          successCount = data.syncedLicenses.length;
-        }
+        successCount = syncedLicensesCount;
       }
       var cssClass = 'calendar-day ';
       cssClass += (!hasData?'no-data ':'has-data ');

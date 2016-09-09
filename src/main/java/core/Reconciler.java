@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.*;
 
+import core.sfdc.responses.NIPRSyncedLicenseCountResponse;
 import core.sfdc.responses.NIPRSyncedLicenseResponse;
 import core.utils.*;
 
@@ -269,6 +270,10 @@ public class Reconciler extends Thread {
 
     public List<NIPRSyncedLicenseResponse> getNIPRSyncedLicenseResponseByDate(String aInDate) throws Exception {
         return this.sfdcService.getNIPRSyncedLicenseResponseByDate(aInDate);
+    }
+
+    public List<NIPRSyncedLicenseCountResponse> getNIPRSyncedLicenseCountResponse(int aInDays) throws Exception {
+        return this.sfdcService.getNIPRSyncedLicenseCountResponse(aInDays);
     }
 
     private List<LicenseInternal>  GetOrderLicenses(Map<String, LicenseInternal> aInLicenses) {

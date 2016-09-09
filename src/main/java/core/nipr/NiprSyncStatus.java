@@ -23,8 +23,10 @@ public class NiprSyncStatus {
 
     private List<NIPRSyncedLicenseResponse> syncedLicenses;
 
-    public NiprSyncStatus() {
+    private Integer syncedLicensesCount;
 
+    public NiprSyncStatus() {
+        syncedLicensesCount = 0;
         failedLicenses = new ArrayList<LicenseInternal>();
         syncedLicenses = new ArrayList<NIPRSyncedLicenseResponse>();
     }
@@ -49,6 +51,10 @@ public class NiprSyncStatus {
         return syncedLicenses;
     }
 
+    public Integer getSyncedLicensesCount() {
+        return syncedLicensesCount;
+    }
+
     public void setSyncedLicenses(List<NIPRSyncedLicenseResponse> syncedLicenses) {
         this.syncedLicenses = syncedLicenses;
     }
@@ -63,6 +69,10 @@ public class NiprSyncStatus {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public void setSyncedLicensesCount(Integer syncedLicensesCount) {
+        this.syncedLicensesCount = syncedLicensesCount;
     }
 
     public void AddLicense(LicenseInternal aInLicense) {

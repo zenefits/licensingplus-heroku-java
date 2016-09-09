@@ -2,6 +2,7 @@ package core;
 
 import core.nipr.LicenseInternal;
 import core.nipr.NiprSyncStatus;
+import core.sfdc.responses.NIPRSyncedLicenseCountResponse;
 import core.sfdc.responses.NIPRSyncedLicenseResponse;
 import core.utils.CalenderUtils;
 
@@ -220,6 +221,25 @@ public class LicenseDB {
 
         Map<String, NiprSyncStatus> lCurrentStatuses = new HashMap<String, NiprSyncStatus>();
         Map<String, List<NIPRSyncedLicenseResponse>> lSuccessLicensesMap = new HashMap<String, List<NIPRSyncedLicenseResponse>>();
+        Map<String, Integer> lSuccessCountMap = new HashMap<String, Integer>();
+
+        int lDays = completedNiprSyncDates.size();
+        if(lDays > 0) {
+            try
+            {
+                List<NIPRSyncedLicenseCountResponse> lSuccessCount = reconciler.getNIPRSyncedLicenseCountResponse(lDays);
+                for(NIPRSyncedLicenseCountResponse lResp : lSuccessCount) {
+                    lSuccessCountMap.put(lResp.getUpdateDate(), lResp.getExpr0());
+                }
+            }
+            catch(Exception ex) {
+                System.out.println("Failed to get the count of successful day");
+            }
+
+        }
+
+        /*
+        TOO SLOW Comment For now
         // Get the success syncs from sfdc
         for(String lCompleteDate : completedNiprSyncDates) {
 
@@ -230,7 +250,7 @@ public class LicenseDB {
             catch(Exception ex) {
                 System.out.println("GetStatus: Failed to get the successful licenses for " + lCompleteDate);
             }
-        }
+        }*/
 
         readLock.lock();
         try{
@@ -245,6 +265,9 @@ public class LicenseDB {
                 lStatus.setStatus(true);
                 if(lSuccessLicensesMap.containsKey(lCompleteDate)) {
                     lStatus.setSyncedLicenses(lSuccessLicensesMap.get(lCompleteDate));
+                }
+                if(lSuccessCountMap.containsKey(lCompleteDate)) {
+                    lStatus.setSyncedLicensesCount(lSuccessCountMap.get(lCompleteDate));
                 }
                 lCurrentStatuses.put(lXmlDate, lStatus);
             }
