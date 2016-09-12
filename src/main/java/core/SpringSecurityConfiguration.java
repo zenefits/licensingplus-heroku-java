@@ -9,7 +9,8 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.formLogin().loginPage("/login.html");
+		http.formLogin().loginPage("/login.html")
+			.and().headers().cacheControl();
 		http.csrf().disable();
 	}
 }
