@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+@CrossOrigin
 @RestController
 public class NiprSyncController {
 
