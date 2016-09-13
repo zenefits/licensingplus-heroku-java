@@ -105,7 +105,6 @@ public class Configuration {
 
         //is this sandbox
         salesForceSandbox = System.getenv(salesForceSandboxField);
-        //throwIfEmpty(salesForceSandboxField, salesForceSandbox);
 
         sendGridApiKey = System.getenv(sendGridApiKeyField);
         sendGridUsername = System.getenv(sendGridUsernameField);
@@ -147,7 +146,7 @@ public class Configuration {
         }
 
         if(!Objects.equals(expectedAuthHeader, new String(aInAuthHeader))) {
-            System.out.println("Auth failed because auth header " + aInAuthHeader + " is not equal to " + expectedAuthHeader);
+            System.out.println("Auth failed because expected auth header and actual auth header is different");
             return false;
         }
 
