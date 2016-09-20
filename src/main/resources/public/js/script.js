@@ -2,6 +2,12 @@ var currMonth = null;
 var currYear = null;
 var calendar = null;
 var statusData = null;
+var selectedDate = null;
+
+var urlPrefix = '';
+
+// uncomment for local development
+// urlPrefix = 'http://licensingplus-java.herokuapp.com';
 
 $(function() {
 
@@ -20,12 +26,14 @@ $(function() {
 });
 
 function loadData() {
+  var username = localStorage.getItem("g_username");
+  var password = localStorage.getItem("g_password");
 
   var request = $.ajax({
-    url: "/getStatus",
+    url: urlPrefix + "/getStatus",
     type: "GET",
     beforeSend: function (xhr) {
-      xhr.setRequestHeader ("Authorization", "Basic " + btoa(localStorage.getItem("g_username") + ":" + localStorage.getItem("g_password")));
+      xhr.setRequestHeader ("Authorization", "Basic " + btoa(username + ":" + password));
     },
   });
 
@@ -33,6 +41,7 @@ function loadData() {
     console.log( "Request  success");
     statusData = data;
     loadMonth(currMonth, currYear);
+    showInfoForDate(selectedDate);
   });
 
   request.fail(function(jqXHR, textStatus) {
@@ -68,7 +77,7 @@ function nextMonth() {
 
 function syncDate(startDate, endDate) {
 
-  var url = '/addNiprSyncDateRange?startDate=' + startDate + '&endDate=' + endDate;
+  var url = urlPrefix + '/addNiprSyncDateRange?startDate=' + startDate + '&endDate=' + endDate;
   var request = $.ajax({
     url: url,
     type: "POST",
@@ -86,6 +95,7 @@ function syncDate(startDate, endDate) {
       alert('Sync command sent for date range: ' + startDate + ' - ' + endDate + '. Results will appear shortly.');
       lTimeout = 15000;
     }
+    loadData();
 
     document.getElementById("loader").style.display = "inline";
 
@@ -112,7 +122,7 @@ function login() {
   var password = $('#password').val();
 
   var request = $.ajax({
-    url: "/authorize",
+    url: urlPrefix + "/authorize",
     type: "POST",
     contentType: "application/json; charset=utf-8",
     data: JSON.stringify({
@@ -139,6 +149,17 @@ function showInfo() {
     return;
   }
   var date = $(event.target).closest('td').attr('id')
+  selectedDate = date;
+  showInfoForDate(date);
+}
+
+function showInfoForDate(date) {
+  if(date == null) {
+    $('#infoTitle').text('');
+    $('#infoError').text('');
+    $('#failedLicenses').empty();
+    return;
+  }
   $('#infoTitle').text('Errors for ' + date);
   $('#infoError').text(calendar.statusData[date].errorMsg);
   $('#failedLicenses').empty();
@@ -154,7 +175,7 @@ function showInfo() {
 function loadMonth(month, year) {
   calendar = new Calendar(currMonth, currYear, statusData);
   calendar.generateHTML();
-  $('#title').text(calendar.monthName + ', ' + currYear);
+  $('#title').text(calendar.monthName + ' ' + currYear);
   $('#calendar').html(calendar.getHTML());
   $('.has-data').click(showInfo);
 }
