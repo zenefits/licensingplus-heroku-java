@@ -9,6 +9,7 @@ import core.Configuration;
 import core.utils.*;
 
 import java.util.GregorianCalendar;
+import java.util.Map.Entry;
 import java.util.*;
 import javax.activation.DataHandler;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -19,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.xml.bind.*;
 import javax.xml.transform.Source;
 
+import org.springframework.util.StringUtils;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.springframework.ws.soap.SoapFaultDetail;
 import org.springframework.ws.soap.SoapFaultDetailElement;
@@ -33,8 +35,10 @@ public class NiprClient extends WebServiceGatewaySupport {
             Map<String, GregorianCalendar> aOutSuccessDates,
             StringBuilder aInOutErrors) {
 
-        Map<String, LicenseInternal> lCurrentDayInfo = new  HashMap<String, LicenseInternal>();
-
+        Map<String, LicenseInternal> lCurrentDayInfo = new HashMap<String, LicenseInternal>();
+        // filtered license info
+        Map<String, LicenseInternal> currentLicenseInfo = new HashMap<String, LicenseInternal>();
+        
         for(GregorianCalendar lCal : aInDates.values()) {
 
             String lFormattedDate = CalenderUtils.getFormattedDate(lCal);
@@ -47,13 +51,23 @@ public class NiprClient extends WebServiceGatewaySupport {
                 System.out.println("Nipr Sync for date " + lFormattedDate + " failed");
                 continue;
             }
+            
+            for (Entry<String, LicenseInternal> entry : lCurrentDayInfo.entrySet()) {
+            		LicenseInternal license = entry.getValue();
+            		// do not process license if effective date is not in nipr alerts
+            		if (license.effectiveDate != null) {
+            			currentLicenseInfo.put(entry.getKey(), license);
+            		} else {
+            			System.out.println("effective date is empty for license - " + entry.getKey());
+            		}
+            }
 
             System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS, generating CSV file");
             // Generate a CSV for it.
             generateAndSendCsvFile(lFormattedDate, lCurrentDayInfo);
 
             // Previous Day is higher
-            mergeReports(lCurrentDayInfo, aInOutLatestLicenses);
+            mergeReports(currentLicenseInfo, aInOutLatestLicenses);
             GregorianCalendar lCalCopy = (GregorianCalendar)lCal.clone();
             aOutSuccessDates.put(CalenderUtils.getFormattedDate(lCalCopy), lCalCopy);
         }
@@ -269,6 +283,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                 lLicenseInt.licenseNumber = lLicense.getLicenseNumberId();
                 XMLGregorianCalendar lCal = lLicense.getIssueDate();
                 lLicenseInt.effectiveDate = CalenderUtils.toSFDCDateFormat(lCal);
+                lLicenseInt.effectiveDate = StringUtils.isEmpty(lLicenseInt.effectiveDate) ? null : lLicenseInt.effectiveDate;
                 LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.License.LicensePeriod lPeriod = lLicense.getLicensePeriod();
                 if(lPeriod != null) {
                     List<Serializable> lContents = lPeriod.getContent();
@@ -278,6 +293,7 @@ public class NiprClient extends WebServiceGatewaySupport {
                             if(lElem.getValue() instanceof XMLGregorianCalendar) {
                                 lCal = (XMLGregorianCalendar)lElem.getValue();
                                 lLicenseInt.expirationDate = CalenderUtils.toSFDCDateFormat(lCal);
+                                lLicenseInt.expirationDate = StringUtils.isEmpty(lLicenseInt.expirationDate) ? null : lLicenseInt.expirationDate;
                             }
 
                         }
