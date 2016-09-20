@@ -55,7 +55,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             for (Entry<String, LicenseInternal> entry : lCurrentDayInfo.entrySet()) {
             		LicenseInternal license = entry.getValue();
             		// do not process license if effective date is not in nipr alerts
-            		if (license.effectiveDate != null) {
+            		if (!StringUtils.isEmpty(license.effectiveDate)) {
             			currentLicenseInfo.put(entry.getKey(), license);
             		} else {
             			System.out.println("effective date is empty for license - " + entry.getKey());
@@ -283,7 +283,6 @@ public class NiprClient extends WebServiceGatewaySupport {
                 lLicenseInt.licenseNumber = lLicense.getLicenseNumberId();
                 XMLGregorianCalendar lCal = lLicense.getIssueDate();
                 lLicenseInt.effectiveDate = CalenderUtils.toSFDCDateFormat(lCal);
-                lLicenseInt.effectiveDate = StringUtils.isEmpty(lLicenseInt.effectiveDate) ? null : lLicenseInt.effectiveDate;
                 LicensingReportProcessResult.LicensingReport.JurisdictionReport.JurisdictionReportItem.Licensee.InsuranceLicense.License.LicensePeriod lPeriod = lLicense.getLicensePeriod();
                 if(lPeriod != null) {
                     List<Serializable> lContents = lPeriod.getContent();
@@ -293,7 +292,6 @@ public class NiprClient extends WebServiceGatewaySupport {
                             if(lElem.getValue() instanceof XMLGregorianCalendar) {
                                 lCal = (XMLGregorianCalendar)lElem.getValue();
                                 lLicenseInt.expirationDate = CalenderUtils.toSFDCDateFormat(lCal);
-                                lLicenseInt.expirationDate = StringUtils.isEmpty(lLicenseInt.expirationDate) ? null : lLicenseInt.expirationDate;
                             }
 
                         }
