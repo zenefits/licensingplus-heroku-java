@@ -1,7 +1,9 @@
 package core.sfdc;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpMethod;
 
@@ -23,6 +25,8 @@ public class SalesforceService {
     private static final String NIPR_LICENSE_SYNC = "LicensingPlus/nipr/sync/license";
     private SalesforceRestClient restClient;
     
+    public static final Set<String> NIPR_ERROR_CODE_TO_IGNORE = new HashSet<String>(Arrays.asList("STALE_DATA_FOUND", "REQUIRED_INFO_MISSING"));
+
     public SalesforceService(String clientSecret, String clientKey, String username, String password, boolean isSandbox) {
     	this.restClient = new SalesforceRestClient(clientSecret, clientKey, username, password, isSandbox);
     }
