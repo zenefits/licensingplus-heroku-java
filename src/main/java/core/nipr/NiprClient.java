@@ -36,8 +36,6 @@ public class NiprClient extends WebServiceGatewaySupport {
             StringBuilder aInOutErrors) {
 
         Map<String, LicenseInternal> lCurrentDayInfo = new HashMap<String, LicenseInternal>();
-        // filtered license info
-        Map<String, LicenseInternal> currentLicenseInfo = new HashMap<String, LicenseInternal>();
         
         for(GregorianCalendar lCal : aInDates.values()) {
 
@@ -51,23 +49,13 @@ public class NiprClient extends WebServiceGatewaySupport {
                 System.out.println("Nipr Sync for date " + lFormattedDate + " failed");
                 continue;
             }
-            
-            for (Entry<String, LicenseInternal> entry : lCurrentDayInfo.entrySet()) {
-            		LicenseInternal license = entry.getValue();
-            		// do not process license if effective date is not in nipr alerts
-            		if (!StringUtils.isEmpty(license.effectiveDate)) {
-            			currentLicenseInfo.put(entry.getKey(), license);
-            		} else {
-            			System.out.println("effective date is empty for license - " + entry.getKey());
-            		}
-            }
 
             System.out.println("Nipr Sync for date " + lFormattedDate + " SUCCESS, generating CSV file");
             // Generate a CSV for it.
             generateAndSendCsvFile(lFormattedDate, lCurrentDayInfo);
 
             // Previous Day is higher
-            mergeReports(currentLicenseInfo, aInOutLatestLicenses);
+            mergeReports(lCurrentDayInfo, aInOutLatestLicenses);
             GregorianCalendar lCalCopy = (GregorianCalendar)lCal.clone();
             aOutSuccessDates.put(CalenderUtils.getFormattedDate(lCalCopy), lCalCopy);
         }
