@@ -88,15 +88,22 @@ public class Reconciler extends Thread {
 
 				UUID lLatestTriggerId = LicenseDB.getResyncTriggerId();
 				if (lLatestTriggerId.compareTo(lResyncTriggerId) != 0) {
-					System.out
-							.println("Reconciler: Reconciler retrying with minimum sleep as resync triggered by user");
+					System.out.println("Reconciler: Reconciler retrying with minimum sleep as resync triggered by user");
 					Thread.sleep(MIN_SLEEP_INTERVAL);
 					continue;
 				}
+                long lInterval = lRetryInterval.get();
 
-				System.out.println("Reconciler: Sleeping for " + lRetryInterval + "ms");
+                if(lUnprocessedLicenses.isEmpty()) {
+                    // Get the current time and set the interval till next day noon.
+                    Calendar cal = Calendar.getInstance();
+                    int lCurrentHour = cal.get(Calendar.HOUR_OF_DAY);
+                    // Next day noon will be 12 hours + 23 - lCurrentHour
+                    lInterval = (23 - lCurrentHour) * 60 * 60 * 1000;
+                }
+				System.out.println("Reconciler: Sleeping for " + lInterval + "ms");
 				try {
-					Thread.sleep(lRetryInterval.get());
+					Thread.sleep(lInterval);
 				} catch (InterruptedException lIntrEx) {
 					System.out.println("Reconciler: interrupted");
 				}
