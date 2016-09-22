@@ -227,7 +227,7 @@ public class LicenseDB {
         if(lDays > 0) {
             try
             {
-                List<NIPRSyncedLicenseCountResponse> lSuccessCount = reconciler.getNIPRSyncedLicenseCountResponse(lDays);
+                List<NIPRSyncedLicenseCountResponse> lSuccessCount = reconciler.getNIPRSyncedLicenseCountResponse(14);
                 for(NIPRSyncedLicenseCountResponse lResp : lSuccessCount) {
                     System.out.println("Date " + lResp.getUpdateDate() + " Success Count: " + lResp.getExpr0());
                     lSuccessCountMap.put(lResp.getUpdateDate(), lResp.getExpr0());
