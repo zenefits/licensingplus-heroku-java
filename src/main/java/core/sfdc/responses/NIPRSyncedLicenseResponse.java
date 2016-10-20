@@ -10,21 +10,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NIPRSyncedLicenseResponse {
-	@JsonProperty("LicensingPlus__Number__c")
+	@JsonProperty("Number__c")
 	private String number;
 	
-	@JsonProperty("LicensingPlus__NPN_Number_Formula__c")
+	@JsonProperty("NPN_Number_Formula__c")
 	private String npnNumberFormula;
 	
-	@JsonProperty("LicensingPlus__NIPR_Update_Date__c")
+	@JsonProperty("NIPR_Update_Date__c")
 	private String updateDate;
 
 	private Attributes attributes;
 	
-	@JsonProperty("LicensingPlus__State__c")
+	@JsonProperty("State__c")
 	private String state;
 
-	@JsonProperty("LicensingPlus__Effective_Date__c")
+	@JsonProperty("Effective_Date__c")
 	private String effectiveDate;
 
 	public String getNumber() {

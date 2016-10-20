@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class NIPRSyncedLicenseCountResponse {
 	private int expr0;
 	
-	@JsonProperty("LicensingPlus__NIPR_Update_Date__c")
+	@JsonProperty("NIPR_Update_Date__c")
 	private String updateDate;
 
 	private Attributes attributes;
