@@ -22,7 +22,7 @@ import core.sfdc.responses.QueryResponseWrapper;
  */
 public class SalesforceService {
 	
-    private static final String NIPR_LICENSE_SYNC = "LicensingPlus/nipr/sync/license";
+    private static final String NIPR_LICENSE_SYNC = "nipr/license";
     private SalesforceRestClient restClient;
     
     public static final Set<String> NIPR_ERROR_CODE_TO_IGNORE = new HashSet<String>(Arrays.asList("STALE_DATA_FOUND", "REQUIRED_INFO_MISSING"));
@@ -32,8 +32,8 @@ public class SalesforceService {
     }
     
     public List<NIPRSyncedLicenseCountResponse> getNIPRSyncedLicenseCountResponse(int days) throws Exception {
-        String queryStr = "SELECT licensingplus__nipr_update_date__c, count(id) FROM licensingplus__License__c WHERE licensingplus__nipr_update_date__c = LAST_N_DAYS:" + days +
-       					"GROUP BY licensingplus__nipr_update_date__c ORDER BY licensingplus__nipr_update_date__c DESC";
+        String queryStr = "SELECT nipr_update_date__c, count(id) FROM License__c WHERE nipr_update_date__c = LAST_N_DAYS:" + days +
+       					"GROUP BY nipr_update_date__c ORDER BY nipr_update_date__c DESC";
         QueryResponseWrapper<NIPRSyncedLicenseCountResponse> response = this.restClient.queryAll(queryStr, NIPRSyncedLicenseCountResponse.class);
        
         List<NIPRSyncedLicenseCountResponse> records = response.getRecords();
@@ -41,9 +41,9 @@ public class SalesforceService {
     }
     
     public List<NIPRSyncedLicenseResponse> getNIPRSyncedLicenseResponseByDate(String date) throws Exception {
-    	String queryStr = "SELECT licensingplus__nipr_update_date__c, licensingplus__npn_number_formula__c, licensingplus__state__c, licensingplus__effective_date__c, licensingplus__number__c "
-				+ "FROM licensingplus__License__c "
-				+ "WHERE licensingplus__nipr_update_date__c=" + date;
+    	String queryStr = "SELECT nipr_update_date__c, npn_number_formula__c, state__c, effective_date__c, number__c "
+				+ "FROM License__c "
+				+ "WHERE nipr_update_date__c=" + date;
     	QueryResponseWrapper<NIPRSyncedLicenseResponse> response = this.restClient.queryAll(queryStr, NIPRSyncedLicenseResponse.class);
 				
     	List<NIPRSyncedLicenseResponse> records = response.getRecords();
