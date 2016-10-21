@@ -98,8 +98,13 @@ public class Reconciler extends Thread {
                     // Get the current time and set the interval till next day noon.
                     Calendar cal = Calendar.getInstance();
                     int lCurrentHour = cal.get(Calendar.HOUR_OF_DAY);
-                    // Next day noon will be 12 hours + 24 - lCurrentHour
-                    lInterval = (24 - lCurrentHour + 12) * 60 * 60 * 1000;
+                    // If currentHour is in the morning before 9am, we want to run at 12pm today, since nipr alerts is not generated yet
+	            // If currentHour is after 9am, we want to run next day noon which will be 12 hours + 24 - lCurrentHour
+		    if (lCurrentHour<9) {
+		        lInterval = (12 - lCurrentHour) * 60 * 60 * 1000;
+		    } else {
+		        lInterval = (24 - lCurrentHour + 12) * 60 * 60 * 1000;
+		    }                 
                 }
 				System.out.println("Reconciler: Sleeping for " + lInterval + "ms");
 				try {
