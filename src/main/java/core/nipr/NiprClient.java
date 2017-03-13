@@ -101,7 +101,7 @@ public class NiprClient extends WebServiceGatewaySupport {
             Object lSoapResponse = getWebServiceTemplate()
                     .marshalSendAndReceive(
                             lRequest,
-                            new SoapActionCallback(getDefaultUri() + "/receiveSpecificReport"));
+                            new SoapActionCallback(getDefaultUri().replace("/services", "") + "/receiveSpecificReport"));
 
             System.out.println("NIPR soap api SUCCESS ++++++++++++ " + formatted);
 
