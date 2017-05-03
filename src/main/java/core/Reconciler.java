@@ -23,10 +23,10 @@ import org.springframework.util.StringUtils;
  */
 public class Reconciler extends Thread {
 
-	static int SALES_FORCE_API_BATCH = 200;
+	static int SALES_FORCE_API_BATCH = 100;
 	static long MIN_SLEEP_INTERVAL = 120000; // 2 Mins
 	static long SALES_FORCE_API_RETRY_INTERVAL = 1800000; // 30 mins
-	static int SALES_FORCE_API_MAX_COUNT = 5;
+	static int SALES_FORCE_API_MAX_COUNT = 10;
 
 	SalesforceService sfdcService = null;
 
